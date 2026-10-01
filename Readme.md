@@ -1,3 +1,6 @@
+<img width="1092" height="700" alt="Screenshot 2026-10-01 233530" src="https://github.com/user-attachments/assets/cfc16c6f-f2f8-4128-9574-727b89f02344" />
+<img width="1526" height="752" alt="Screenshot 2026-10-01 233430" src="https://github.com/user-attachments/assets/0147a611-d1e6-4146-adcb-9b012b3e369b" />
+<img width="1190" height="692" alt="Screenshot 2026-10-01 233612" src="https://github.com/user-attachments/assets/7d3afb35-c39e-4c15-9570-1b50f8167792" />
  # Indian Agriculture Statistics
 
 ## Overview
@@ -95,3 +98,6 @@ Add the exact sources used in this project here, including dataset names, URLs, 
 ## License and Attribution
 
 Add the project license and attribution requirements for each dataset here. Credit all original data providers and comply with their terms of use.
+<img width="1190" height="692" alt="Screenshot 2026-10-01 233612" src="https://github.com/user-attachments/assets/cb332dfc-a0bd-4f9e-bfbc-8f3f2ca333b2" />
+<img width="1092" height="700" alt="Screenshot 2026-10-01 233530" src="https://github.com/user-attachments/assets/f6a1cd47-6f57-4069-9609-05095ee75956" />
+<img width="1526" height="752" alt="Screenshot 2026-10-01 233430" src="https://github.com/user-attachments/assets/fe760610-dff8-4f6b-bda5-2326b0798325" />
