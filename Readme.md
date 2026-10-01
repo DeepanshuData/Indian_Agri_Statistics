@@ -38,6 +38,19 @@ Indian_Agri_Statistics/
 
 The folders above describe a recommended organization; use the directories available in the project as the authoritative structure.
 
+## Streamlit Dashboard
+
+The interactive dashboard is kept separate from the existing learning scripts in
+`app/`. It reads `data/agridata.csv` (or the existing `Data/agridata.csv` folder),
+and does not write changes to the source CSV.
+
+Install the dashboard dependencies and start the app from the project root:
+
+```bash
+python -m pip install -r requirements.txt
+streamlit run app/app.py
+```
+
 ## Typical Workflow
 
 1. Obtain data from the relevant official or publicly available source.

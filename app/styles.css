@@ -1,0 +1,137 @@
+.stApp {
+    background-color: #111713;
+    background-image:
+        linear-gradient(rgba(13, 19, 15, 0.91), rgba(13, 19, 15, 0.94)),
+        url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2200&q=80");
+    background-position: center, center;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #e5ebe6;
+}
+
+[data-testid="stAppViewContainer"] {
+    background: transparent;
+}
+
+[data-testid="stHeader"] {
+    background: rgba(13, 19, 15, 0.78);
+}
+
+[data-testid="stAppViewContainer"] > .main .block-container {
+    max-width: 1480px;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+}
+
+h1 {
+    color: #edf3ee;
+    font-size: 2rem !important;
+    font-weight: 650 !important;
+    letter-spacing: -0.035em;
+    margin-bottom: 0.2rem !important;
+}
+
+h2, h3 {
+    color: #e0e9e2;
+    letter-spacing: -0.015em;
+}
+
+div[data-testid="stMarkdownContainer"] p,
+[data-testid="stCaptionContainer"] {
+    color: #c0cbc2;
+}
+
+.app-subtitle {
+    color: #b8c5bb;
+    font-size: 1rem;
+    margin: 0.15rem 0 1.2rem;
+}
+
+.section-rule {
+    border-top: 1px solid #344139;
+    margin: 1.4rem 0 1.1rem;
+}
+
+[data-testid="stMetric"] {
+    background: rgba(24, 33, 28, 0.94);
+    border: 1px solid #344139;
+    border-radius: 7px;
+    padding: 0.9rem 1rem;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #bdc9bf;
+    font-size: 0.85rem;
+}
+
+[data-testid="stMetricValue"] {
+    color: #e5ebe6;
+    font-size: 1.65rem;
+    font-weight: 620;
+}
+
+[data-testid="stSidebar"] {
+    background: rgba(17, 24, 20, 0.97);
+    border-right: 1px solid #344139;
+}
+
+[data-testid="stSidebar"] h3 {
+    color: #e5ebe6;
+    font-size: 1rem;
+}
+
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+    color: #c0cbc2 !important;
+}
+
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+    background-color: #202a24 !important;
+    border-color: #46554a !important;
+    color: #e5ebe6 !important;
+}
+
+[data-testid="stSidebar"] [data-baseweb="select"] input,
+[data-testid="stSidebar"] [data-baseweb="select"] span {
+    color: #e5ebe6 !important;
+}
+
+[role="listbox"],
+[role="option"] {
+    background-color: #202a24 !important;
+    color: #e5ebe6 !important;
+}
+
+[data-testid="stExpander"] {
+    background: rgba(24, 33, 28, 0.94);
+    border: 1px solid #344139;
+    border-radius: 6px;
+}
+
+[data-testid="stDataFrame"] {
+    border: 1px solid #344139;
+    border-radius: 6px;
+}
+
+.footer-rule {
+    margin-top: 2rem;
+}
+
+@media (max-width: 700px) {
+    [data-testid="stAppViewContainer"] > .main .block-container {
+        padding: 1.25rem 1rem 2rem;
+    }
+
+    h1 {
+        font-size: 1.65rem !important;
+    }
+
+    [data-testid="stMetric"] {
+        padding: 0.7rem;
+    }
+
+    [data-testid="stMetricValue"] {
+        font-size: 1.3rem;
+    }
+}
