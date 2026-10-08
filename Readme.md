@@ -1,3 +1,6 @@
+<img width="1112" height="673" alt="Screenshot 2026-10-08 155934" src="https://github.com/user-attachments/assets/d9a26c71-ec10-4b46-a02b-278727a6d829" />
+<img width="1100" height="697" alt="Screenshot 2026-10-08 155648" src="https://github.com/user-attachments/assets/54dc370a-1af9-4a45-b1d2-0590a7d39587" />
+<img width="1530" height="732" alt="Screenshot 2026-10-08 155544" src="https://github.com/user-attachments/assets/c9d2e395-33d1-426f-9b66-b2b1139552a9" />
 # 🌾 AgriProfit Intelligence
 
 ### Turning agricultural data into profitable decisions
