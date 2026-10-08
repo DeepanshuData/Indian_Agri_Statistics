@@ -1,0 +1,12 @@
+crop,cost_per_acre,price_per_kg,price_volatility,water_requirement
+Rice,40000,28,0.18,High
+Wheat,30000,25,0.15,Medium
+Maize,24000,22,0.12,Medium
+Groundnut,28000,65,0.20,Low
+Cotton,37000,70,0.30,Medium
+Soybean,26000,48,0.22,Medium
+Sugarcane,55000,35,0.25,High
+Tomato,41000,24,0.40,Medium
+Gram,22000,65,0.18,Low
+Jowar,18000,32,0.16,Low
+

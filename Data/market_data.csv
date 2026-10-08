@@ -1,0 +1,8 @@
+crop,origin_market,destination_market,current_price_per_kg,distance_km,transport_cost_per_kg
+Tomato,Mysuru,Mysuru,24,20,1.2
+Tomato,Mysuru,Bengaluru,31,145,5.0
+Tomato,Mysuru,Mandya,27,70,2.5
+Maize,Belagavi,Belagavi,22,15,1.0
+Maize,Belagavi,Bengaluru,25,100,3.5
+Groundnut,Belagavi,Belagavi,65,15,1.0
+Groundnut,Belagavi,Bengaluru,70,100,3.5
