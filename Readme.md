@@ -201,4 +201,3 @@ visualization, API integration, and business-oriented decision support.
 <img width="1092" height="700" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/cfc16c6f-f2f8-4128-9574-727b89f02344" />
 <img width="1526" height="752" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/0147a611-d1e6-4146-adcb-9b012b3e369b" />
 <img width="1190" height="692" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/7d3afb35-c39e-4c15-9570-1b50f8167792" />
-<img width="1190" height="692" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/cb332dfc-a0bd-4f9e-bfbc-8f3f2ca333b2" />
