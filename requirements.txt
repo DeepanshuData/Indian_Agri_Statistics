@@ -1,4 +1,8 @@
-streamlit
+
 pandas
-plotly
-requests
+numpy
+matplotlib
+SQLAlchemy
+psycopg[binary]
+python-dotenv
+
