@@ -135,6 +135,125 @@ Indian_Agri_Statistics/
 The repository also includes standalone Python analysis scripts and SQL
 examples.
 
+## 🗄 PostgreSQL checks used for the agriculture dataset
+
+The project includes PostgreSQL validation queries for the
+`public.agriculture` table before indexing. These checks establish a baseline
+for record volume, existing indexes, and the performance of common district and
+crop-based queries.
+
+```sql
+-- Query 1: Count records
+SELECT COUNT(*) AS total_records
+FROM public.agriculture;
+
+-- Query 2: Check existing indexes
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
+  AND tablename = 'agriculture'
+ORDER BY indexname;
+
+-- Query 3: District lookup performance
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    state,
+    district,
+    crop,
+    year,
+    season,
+    area,
+    production,
+    "yield"
+FROM public.agriculture
+WHERE state = 'PUNJAB'
+  AND district = 'FIROZPUR';
+
+-- Query 4: Rice yield analysis performance
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    state,
+    district,
+    AVG("yield") AS average_rice_yield
+FROM public.agriculture
+WHERE LOWER(crop) = 'rice'
+  AND "yield" IS NOT NULL
+GROUP BY state, district
+ORDER BY state, average_rice_yield DESC;
+```
+
+These SQL checks are intended as a baseline before adding indexes for common
+filtering and aggregation patterns such as state, district, and crop analysis.
+
+## 🗄 PostgreSQL indexing changes applied
+
+The PostgreSQL optimization work adds targeted indexes for the most frequent
+agriculture queries and then re-runs the same validation checks to confirm the
+performance impact.
+
+```sql
+-- Index 1: Speed up state and district lookups
+CREATE INDEX IF NOT EXISTS idx_agriculture_state_district
+ON public.agriculture (state, district);
+
+-- Index 2: Support crop-based analysis
+CREATE INDEX IF NOT EXISTS idx_agriculture_crop_state_district
+ON public.agriculture (LOWER(crop), state, district)
+INCLUDE ("yield");
+
+-- Update PostgreSQL table statistics
+ANALYZE public.agriculture;
+
+-- Verify indexes
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
+  AND tablename = 'agriculture'
+ORDER BY indexname;
+```
+
+After indexing, the project re-checks the same district and rice yield queries to
+compare execution plans and confirm the query improvements.
+
+```sql
+-- Check indexes
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
+  AND tablename = 'agriculture'
+ORDER BY indexname;
+
+-- District lookup after indexing
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    state,
+    district,
+    crop,
+    year,
+    season,
+    area,
+    production,
+    "yield"
+FROM public.agriculture
+WHERE state = 'PUNJAB'
+  AND district = 'FIROZPUR';
+
+-- Rice yield analysis after indexing
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    state,
+    district,
+    AVG("yield") AS average_rice_yield
+FROM public.agriculture
+WHERE LOWER(crop) = 'rice'
+  AND "yield" IS NOT NULL
+GROUP BY state, district
+ORDER BY state, average_rice_yield DESC;
+```
+
+This optimization focuses on faster filtering by state/district and crop-based
+aggregation for agricultural analysis workflows in PostgreSQL.
+
 ## 📌 Data, Assumptions & Limitations
 
 - The agriculture CSV contains state, district, crop, year, season, area,
