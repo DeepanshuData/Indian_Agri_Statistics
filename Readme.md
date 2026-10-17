@@ -1,6 +1,3 @@
-<img width="1112" height="673" alt="Screenshot 2026-10-08 155934" src="https://github.com/user-attachments/assets/d9a26c71-ec10-4b46-a02b-278727a6d829" />
-<img width="1100" height="697" alt="Screenshot 2026-10-08 155648" src="https://github.com/user-attachments/assets/54dc370a-1af9-4a45-b1d2-0590a7d39587" />
-<img width="1530" height="732" alt="Screenshot 2026-10-08 155544" src="https://github.com/user-attachments/assets/c9d2e395-33d1-426f-9b66-b2b1139552a9" />
 # 🌾 AgriProfit Intelligence
 
 ### Turning agricultural data into profitable decisions
@@ -37,14 +34,17 @@ It is:
 The application combines the included agriculture statistics with supplied
 crop-economics and market reference data, and can retrieve a five-day forecast
 from Open-Meteo. Interactive tools turn these inputs into estimates and
-comparisons, while making the assumptions and data coverage visible.
+comparisons, while making the assumptions and data coverage visible. A GIS
+section also presents completed PostGIS river-buffer coverage results and
+district-area comparisons when those result files are available.
 
 ## 🚀 Key Capabilities
 
 ### 1. Explore agricultural statistics
 
 - Filter records by state, district, crop, season, and year.
-- Review area, production, yield, and record-count summaries.
+- Review total area, total production, area-weighted average yield, and
+  record-count summaries.
 - Visualize crop area by state, production by crop, area trends, and state-by-crop
   area.
 
@@ -68,17 +68,47 @@ ROI                 = Expected profit ÷ Estimated cost × 100
 
 The application converts acres to hectares and tonnes to kilograms when
 combining the agriculture yield data with prices per kilogram.
+The dashboard's average yield is area-weighted across records with valid
+positive area and yield values.
 
 ### 4. Where Should I Sell?
 
 Compare destinations listed in the supplied market data using price, distance,
-estimated transport cost, and net realization for the selected quantity.
+estimated transport cost, and net realization for the selected quantity. The
+comparison dashboard ranks the listed markets and summarizes their reference
+prices and transport estimates; these are not live quotes.
 
 ### 5. Weather Risk
 
 Look up a district using Open-Meteo geocoding, view its five-day forecast, and
 summarize rainfall, maximum precipitation probability, and a simple risk
-category.
+category. The view labels state-level coordinate fallbacks as approximate.
+
+### 6. GIS & Spatial Analysis
+
+- Explore district area covered by dissolved 5 km river buffers in a
+  map-first workspace with district selection, state and district filters,
+  satellite or dark basemaps, and thematic layers for buffer coverage,
+  cultivated area, production, and area-weighted yield.
+- Inspect selected geographies alongside agriculture records and river-buffer
+  coverage, then review the ranked coverage chart and underlying results.
+- The interactive outline map uses the districts in the supplied spatial
+  export; it does not claim complete coverage of every current district.
+- Review the initial comparison of calculated district areas with Census 2011
+  reference areas.
+- Results are generated with PostgreSQL/PostGIS and exported to CSV for the
+  application. The GIS view is optional and does not require a live database
+  connection when the result file is present.
+
+### 7. Crop DNA
+
+Explore historical crop-performance profiles by crop, state, season, and year,
+including area-weighted yields, recorded area and production, and reference
+economics where available. The field-monitoring view maps agriculture records
+to district coordinates. It is not a genetic profile or live field-monitoring
+system: the project does not include genomic traits, farm parcel boundaries,
+NDVI, soil sensors, or irrigation observations, and the map does not infer
+those values.
 
 ## 🧭 How the Application Works
 
@@ -87,6 +117,8 @@ Agriculture CSV ──┐
 Crop economics ───┼──> Pandas calculations ──> Estimates and rankings ──┐
 Market reference ─┘                                                      ├──> Streamlit dashboard
 District selection ──> Open-Meteo geocoding and forecast ────────────────┘
+PostGIS analysis ──> CSV results ──> GIS & Spatial Analysis view
+Agriculture history ──> Crop DNA profile and district-coordinate view
 ```
 
 ## 🛠 Technology Stack
@@ -96,6 +128,9 @@ District selection ──> Open-Meteo geocoding and forecast ──────�
 - **Streamlit** for the interactive web application
 - **Plotly** for interactive charts
 - **Requests** for Open-Meteo API calls
+- **PostgreSQL/PostGIS** for spatial queries, area calculations, and river-buffer
+  analysis
+- **GeoPandas** for loading and exporting spatial query results
 - **CSV** for agriculture statistics and reference economics/market data
 
 ## ▶️ Run Locally
@@ -113,7 +148,22 @@ Open the local URL printed by Streamlit (usually
 
 Weather lookup requires an internet connection. Crop recommendations and
 profitability require `Data/crop_economics.csv`; market comparison requires
-`Data/market_data.csv`.
+`Data/market_data.csv`. Crop DNA profiles can use the same crop-economics
+reference file when it is available. Its district map uses
+`Data/district_coordinates.csv` and historical agriculture records. The GIS &
+Spatial Analysis view reads
+`output/river_buffer_coverage_by_district.csv` and, when present,
+`output/districts_intersecting_rivers.geojson` for the interactive boundary map.
+To generate the optional GIS exports, configure the local PostGIS database and
+tables documented in `sql/postgis/`, then run:
+
+```bash
+python 04_spatial_query.py
+python 06_buffer_coverage.py
+```
+
+The GeoJSON and CSV exports are generated locally and are not included in the
+repository. These GIS scripts are separate from the standard dashboard setup.
 
 ## 🗂 Project Structure
 
@@ -130,13 +180,27 @@ Indian_Agri_Statistics/
 │   ├── agridata.csv                 # Historical crop statistics
 │   ├── crop_economics.csv           # Reference prices, costs, and risk inputs
 │   ├── market_data.csv              # Reference destination prices and transport
-│   └── district_coordinates.csv     # Optional coordinates data
+│   ├── district_coordinates.csv     # District locations and state-level fallbacks
+│   └── reference/
+│       └── census_2011_district_areas.csv
+├── docs/
+│   ├── district_area_comparison.md  # GIS area comparison results and limitations
+│   └── postgis/                     # CRS reprojection workflow
+├── sql/
+│   └── postgis/                     # PostGIS geometry and spatial analysis queries
+├── src/                             # PostgreSQL-to-Pandas analysis pipeline
+├── 03_geopandas_analysis.py
+├── 04_spatial_query.py
+├── 06_buffer_coverage.py
+├── postgis_spatial_sql_interview_flashcards.ipynb
 ├── requirements.txt
 └── Readme.md
 ```
 
-The repository also includes standalone Python analysis scripts and SQL
-examples.
+The project also includes PostgreSQL-to-Pandas analysis code, census spreadsheet
+inspection/conversion utilities, and additional standalone spatial validation
+scripts. Raw GIS source data and generated output files are kept outside version
+control.
 
 ## 🗄 PostgreSQL checks used for the agriculture dataset
 
@@ -257,6 +321,36 @@ ORDER BY state, average_rice_yield DESC;
 This optimization focuses on faster filtering by state/district and crop-based
 aggregation for agricultural analysis workflows in PostgreSQL.
 
+## 🗺 PostGIS spatial analysis completed
+
+The GIS work extends the agriculture data analysis with district geometry
+validation, CRS reprojection, area measurement, and river-buffer overlays:
+
+- Reprojected district geometries from EPSG:4326 to EPSG:7755 and created a
+  separate EPSG:6933 equal-area layer. The workflows check feature counts,
+  geometry validity, and spatial indexes.
+- Compared spheroid-based `geography` areas with projected area calculations.
+  Agreement between methods is reported only at the precision documented in the
+  analysis; it does not validate the source geometries.
+- Queried district intersections with dissolved 5 km river buffers and calculated
+  the intersected area and percentage of each district.
+- Produced 689 district coverage records. The mean buffer-covered area is
+  85.47%; these are geometric overlap statistics, not measures of water access
+  or agricultural impact.
+- Compared calculated district areas with Census 2011 reference values. The
+  initial comparison matched 550 districts, with a 206.71 km² average absolute
+  difference and a 6.26% average percentage difference. The largest percentage
+  difference was 603.44% for Lakshadweep; the cause remains unconfirmed.
+
+The river coverage results used by the web app are exported to
+`output/river_buffer_coverage_by_district.csv`. Generated CSV and GIS source
+files are excluded from version control, so users need to run the PostGIS
+workflow locally to regenerate them. SQL workflows are in `sql/postgis/`;
+`docs/district_area_comparison.md` and `docs/postgis/reprojection_project.md`
+describe methods and limitations. The notebook
+`postgis_spatial_sql_interview_flashcards.ipynb` contains PostGIS practice
+material.
+
 ## 📌 Data, Assumptions & Limitations
 
 - The agriculture CSV contains state, district, crop, year, season, area,
@@ -265,6 +359,12 @@ aggregation for agricultural analysis workflows in PostgreSQL.
 - The included economics and market values are reference inputs, not guaranteed
   current prices or quotes. Market comparisons are limited to destinations and
   crops present in `Data/market_data.csv`.
+- Weather uses local district representative points when available, then
+  Open-Meteo geocoding. If neither resolves the district, the app uses a clearly
+  labeled approximate state-level location; it is not a district forecast.
+- `Data/district_coordinates.csv` stores representative points generated from the
+  project's district boundary layer and state-level fallback points for its
+  supported states.
 - Profitability and recommendations are estimates based on historical average
   yield and the selected assumptions. They do not account for every factor
   affecting realized farm returns.
@@ -274,6 +374,9 @@ aggregation for agricultural analysis workflows in PostgreSQL.
 - Results depend on data quality, units, administrative boundaries, and the
   coverage of the available datasets. Confirm assumptions before making
   financial or planting decisions.
+- District-area and river-buffer results depend on the source geometries,
+  boundary vintage, CRS, and area method. The Census comparison is preliminary;
+  large discrepancies have not been explained or corrected.
 - Weather services may be unavailable or return no result for a selected
   location.
 
@@ -298,9 +401,19 @@ licenses alongside future data updates.
 - [x] Market destination comparison
 - [x] Five-day weather risk view
 
-### Phase 3 — Potential next steps
+### Phase 3 — Spatial analysis foundation
 
-- [ ] Automated, documented ingestion from verified data sources
+- [x] District geometry inspection, reprojection, and area calculation in PostGIS
+- [x] Compare EPSG:7755, EPSG:6933, and spheroid-based area methods
+- [x] Spatial intersection queries and 5 km river-buffer district coverage
+- [x] Initial comparison of calculated district areas with Census 2011 references
+- [x] Streamlit view for river-buffer coverage and area comparison summaries
+- [x] PostGIS spatial SQL interview flashcards notebook
+
+### Phase 4 — Potential next steps
+
+- [ ] Resolve district-area discrepancies through source and boundary-vintage checks
+- [ ] Automate documented ingestion from verified data sources
 - [ ] Broader and regularly updated crop economics and market coverage
 - [ ] Persistent data storage and service API
 - [ ] User accounts and production deployment
@@ -320,6 +433,9 @@ visualization, API integration, and business-oriented decision support.
 
 ### Dashboard screenshots
 
-<img width="1092" height="700" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/cfc16c6f-f2f8-4128-9574-727b89f02344" />
-<img width="1526" height="752" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/0147a611-d1e6-4146-adcb-9b012b3e369b" />
-<img width="1190" height="692" alt="Agriculture dashboard screenshot" src="https://github.com/user-attachments/assets/7d3afb35-c39e-4c15-9570-1b50f8167792" />
+![Dashboard overview](docs/images/dashboard-home.png)
+![Crop DNA district activity map](docs/images/crop-dna.png)
+![Crop profitability estimate](docs/images/profitability.png)
+![Market destination comparison](docs/images/market-comparison.png)
+![Five-day weather risk forecast](docs/images/weather-risk.png)
+![GIS and spatial analysis map](docs/images/gis-spatial-analysis.png)

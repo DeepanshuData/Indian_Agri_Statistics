@@ -1,0 +1,731 @@
+state,district,latitude,longitude,precision
+Uttarakhand,Nainital,29.291626,79.434896,district
+Uttarakhand,Dehradun,30.473541,77.858468,district
+Uttarakhand,Almora,29.699053,79.434965,district
+Uttarakhand,Champawat,29.232762,80.102061,district
+Uttarakhand,Uttarkashi,30.957942,78.639491,district
+Uttarakhand,Garhwal,29.843082,78.709418,district
+Uttarakhand,Hardwar,29.88901,78.002118,district
+Uttarakhand,Rudraprayag,30.487054,79.031488,district
+Uttarakhand,Tehri Garhwal,30.46006,78.489229,district
+Uttarakhand,Bageshwar,29.989952,79.774594,district
+Uttarakhand,Pithoragarh,30.12497,80.480882,district
+Uttarakhand,Chamoli,30.502398,79.61856,district
+Uttarakhand,Udham Singh Nagar,29.042355,79.437936,district
+Himachal Pradesh,Chamba,32.684112,76.168837,district
+Himachal Pradesh,Shimla,31.235849,77.641049,district
+Himachal Pradesh,Bilaspur,31.403502,76.642373,district
+Himachal Pradesh,Kangra,32.071747,76.326123,district
+Himachal Pradesh,Lahul & Spiti,32.505958,77.587102,district
+Himachal Pradesh,Una,31.584885,76.237558,district
+Himachal Pradesh,Solan,31.05473,76.847697,district
+Himachal Pradesh,Sirmaur,30.699203,77.455664,district
+Himachal Pradesh,Kinnaur,31.587423,78.336572,district
+Himachal Pradesh,Mandi,31.65182,77.011955,district
+Himachal Pradesh,Kullu,31.880736,77.449949,district
+Madhya Pradesh,Bhind,26.347873,78.719742,district
+Madhya Pradesh,Jhabua,22.888253,74.731762,district
+Madhya Pradesh,Seoni,22.272911,79.722737,district
+Madhya Pradesh,Khandwa (East Nimar),21.966026,76.531594,district
+Madhya Pradesh,Umaria,23.637733,80.942488,district
+Himachal Pradesh,Hamirpur,31.656708,76.541853,district
+Jammu & Kashmir,DATA NOT AVAILABLE,34.958071,75.520901,district
+Jammu & Kashmir,Anantnag,33.796094,75.283452,district
+Jammu & Kashmir,Baramula,34.10741,74.279128,district
+Jammu & Kashmir,Kulgam,33.616443,74.714916,district
+Jammu & Kashmir,Shupiyan,33.69343,74.802093,district
+Jammu & Kashmir,Reasi,33.207228,74.91307,district
+Jammu & Kashmir,Rajouri,33.236339,74.333666,district
+Jammu & Kashmir,Jammu,32.759301,74.774641,district
+Jammu & Kashmir,Srinagar,34.080673,74.944955,district
+Jammu & Kashmir,Punch,33.660921,74.27289,district
+Jammu & Kashmir,Kupwara,34.483486,74.183709,district
+Jammu & Kashmir,Samba,32.629246,75.088411,district
+Jammu & Kashmir,Bandipore,34.458321,74.898983,district
+Jammu & Kashmir,Kathua,32.585544,75.617276,district
+Jammu & Kashmir,Kishtwar,33.619954,75.895435,district
+Gujarat,Sabar Kantha,23.866913,73.014072,district
+Gujarat,Banas Kantha,24.282465,72.133425,district
+Gujarat,Surendranagar,22.828042,71.553093,district
+Gujarat,Anand,22.479042,72.73479,district
+Gujarat,Narmada,21.735939,73.621024,district
+Gujarat,Amreli,21.423376,71.279031,district
+Gujarat,Dohad,22.926599,74.13021,district
+Jammu & Kashmir,Doda,33.134861,75.600846,district
+Jammu & Kashmir,Pulwama,33.916671,75.058457,district
+Gujarat,Vadodara,22.314287,73.300254,district
+Gujarat,Aravali,23.487654,73.399128,district
+Madhya Pradesh,Gwalior,26.024845,78.158696,district
+Madhya Pradesh,Damoh,23.79579,79.543354,district
+Madhya Pradesh,Dhar,22.587098,75.240096,district
+Madhya Pradesh,Katni,23.71335,80.261417,district
+Madhya Pradesh,Sidhi,24.21263,81.681605,district
+Madhya Pradesh,Alirajpur,22.28937,74.361185,district
+Madhya Pradesh,Singrauli,24.242652,82.362858,district
+Madhya Pradesh,Bhopal,23.482393,77.396303,district
+Jammu & Kashmir,Ramban,33.317301,75.249454,district
+Jammu & Kashmir,Ganderbal,34.276776,75.027837,district
+Jammu & Kashmir,Udhampur,32.9168,75.30621,district
+Jammu & Kashmir,Badgam,33.862529,74.673296,district
+Madhya Pradesh,Rajgarh,23.868422,76.782348,district
+Madhya Pradesh,Mandla,22.684777,80.584668,district
+Madhya Pradesh,Shajapur,23.707217,76.131794,district
+Madhya Pradesh,Shivpuri,25.369672,77.80202,district
+Madhya Pradesh,Datia,25.917667,78.66727,district
+Madhya Pradesh,Shahdol,23.639963,81.422449,district
+Madhya Pradesh,Vidisha,23.846118,77.833513,district
+Andhra Pradesh,Prakasam,15.642216,79.515309,district
+Andhra Pradesh,Krishna,16.429093,81.063183,district
+West Bengal,Hugli,22.920019,88.030664,district
+Uttar Pradesh,Ambedkar Nagar,26.40851,82.573176,district
+Uttar Pradesh,Ballia,25.86897,84.138368,district
+Uttar Pradesh,Kanpur Nagar,26.439266,80.274318,district
+Uttar Pradesh,Sant Ravidas Nagar (Bhadohi),25.355166,82.499277,district
+Daman & Diu,Daman,20.405107,72.866958,district
+Daman & Diu,Diu,20.72226,70.930365,district
+Gujarat,Bhavnagar,21.5678,71.893723,district
+Gujarat,Ahmadabad,22.736681,72.315611,district
+Gujarat,Chhota Udaipur,22.212323,73.787666,district
+Gujarat,Batod,22.047517,71.651023,district
+Gujarat,Rajkot,22.09865,71.024228,district
+Gujarat,Kachchh,23.671422,69.771166,district
+Andhra Pradesh,Kurnool,15.525393,77.906246,district
+Andhra Pradesh,Guntur,16.27374,80.188362,district
+Andhra Pradesh,Vizianagaram,18.498055,83.315868,district
+Andhra Pradesh,Anantapur,14.456849,77.493135,district
+Andhra Pradesh,West Godavari,16.909309,81.368895,district
+Andhra Pradesh,Kadapa(YSR),14.477561,78.663983,district
+Kerala,Kannur,11.988844,75.55016,district
+Kerala,Pathanamthitta,9.278419,76.953885,district
+Kerala,Alappuzha,9.500162,76.408295,district
+Kerala,Ernakulam,10.047619,76.496811,district
+Kerala,Kollam,8.965452,76.856425,district
+Kerala,Kasaragod,12.446343,75.188119,district
+Kerala,Idukki,9.80886,77.01608,district
+Gujarat,The Dangs,20.79136,73.712593,district
+Gujarat,Mahesana,23.559125,72.388714,district
+Gujarat,Patan,23.762109,71.795368,district
+Gujarat,Bharuch,21.817914,72.865927,district
+Gujarat,Gir Somnath,20.988275,70.707217,district
+Gujarat,Junagadh,21.35599,70.432888,district
+Gujarat,Devbhumi Dwarka,22.14003,69.441442,district
+Gujarat,Navsari,20.823026,73.036668,district
+Gujarat,Surat,21.179564,72.950442,district
+Gujarat,Jamnagar,22.301159,70.110054,district
+Gujarat,Tapi,21.177353,73.557224,district
+Gujarat,Kheda,22.85797,72.992358,district
+Madhya Pradesh,Betul,21.877497,77.878968,district
+Madhya Pradesh,Hoshangabad,22.598575,77.927278,district
+Madhya Pradesh,Sehore,23.110586,77.069153,district
+Madhya Pradesh,Jabalpur,23.22341,79.985545,district
+Madhya Pradesh,Narsimhapur,22.931944,79.089266,district
+Madhya Pradesh,Panna,24.447561,80.14808,district
+Madhya Pradesh,Ujjain,23.293925,75.637257,district
+Madhya Pradesh,Rewa,24.746438,81.651023,district
+Madhya Pradesh,Dindori,22.907079,80.865688,district
+Madhya Pradesh,Balaghat,21.861287,80.312302,district
+Madhya Pradesh,Barwani,21.733565,74.894532,district
+Gujarat,Porbandar,21.600978,69.845955,district
+Gujarat,Valsad,20.436186,73.173209,district
+Gujarat,Gandhinagar,23.275748,72.654186,district
+Gujarat,Mahisagar,23.195838,73.657353,district
+Gujarat,Morbi,22.790618,70.870369,district
+Gujarat,Panch Mahals,22.69094,73.617703,district
+Kerala,Kozhikode,11.466894,75.895489,district
+Kerala,Kottayam,9.631431,76.661519,district
+Kerala,Thrissur,10.478997,76.273367,district
+Kerala,Palakkad,10.782912,76.574372,district
+Kerala,Thiruvananthapuram,8.577711,77.049965,district
+Kerala,Malappuram,11.107722,76.118207,district
+Kerala,Wayanad,11.714264,76.091111,district
+Lakshadweep,Lakshadweep,11.158571,72.047414,district
+Sikkim,North District,27.756149,88.525539,district
+Bihar,Sheikhpura,25.113547,85.861369,district
+Bihar,Jehanabad,25.15618,85.018936,district
+Bihar,Saharsa,25.821944,86.605485,district
+Dadra & Nagar Haveli,Dadra & Nagar Haveli,20.200874,73.010035,district
+Madhya Pradesh,Ashoknagar,24.615714,77.872681,district
+Madhya Pradesh,Raisen,23.26433,78.181263,district
+Madhya Pradesh,Chhindwara,22.137976,78.810098,district
+Bihar,Patna,25.473576,85.189979,district
+Madhya Pradesh,Satna,24.576412,80.81151,district
+Madhya Pradesh,Chhatarpur,24.760073,79.681724,district
+Madhya Pradesh,Indore,22.703312,75.808568,district
+Madhya Pradesh,Ratlam,23.4853,74.923061,district
+Madhya Pradesh,Harda,22.238707,77.106622,district
+Madhya Pradesh,Sagar,23.80743,78.762829,district
+Madhya Pradesh,Neemuch,24.623566,75.186288,district
+Madhya Pradesh,Tikamgarh,24.996933,78.990103,district
+Madhya Pradesh,Guna,24.497462,77.259128,district
+Madhya Pradesh,Dewas,22.803777,76.29697,district
+Madhya Pradesh,Mandsaur,24.263332,75.381424,district
+Madhya Pradesh,Khargone (West Nimar),21.947905,75.747011,district
+Madhya Pradesh,Sheopur,25.702494,76.882211,district
+Madhya Pradesh,Morena,26.360591,77.807738,district
+Madhya Pradesh,Burhanpur,21.328335,76.375231,district
+Madhya Pradesh,Anuppur,23.033762,81.758969,district
+Andhra Pradesh,East Godavari,17.157881,82.064375,district
+Andhra Pradesh,Visakhapatnam,17.898705,82.569256,district
+Andhra Pradesh,Sri Potti Sriramulu Nellore,14.295324,79.780942,district
+Andhra Pradesh,Chittoor,13.337037,78.917558,district
+Andhra Pradesh,Srikakulam,18.630482,83.968046,district
+Sikkim,East District,27.284624,88.673473,district
+West Bengal,Nadia,23.493496,88.565186,district
+West Bengal,Dakshin Dinajpur,25.387314,88.51188,district
+Sikkim,South District,27.307858,88.382388,district
+West Bengal,Murshidabad,24.266837,88.378594,district
+West Bengal,Barddhaman,23.391016,87.883005,district
+West Bengal,Bankura,23.118266,87.240467,district
+West Bengal,Puruliya,23.215932,86.294568,district
+West Bengal,Koch Bihar,26.247241,89.422235,district
+West Bengal,Paschim Medinipur,22.364809,87.242691,district
+Sikkim,West District,27.362747,88.184282,district
+West Bengal,Kolkata,22.565894,88.373778,district
+West Bengal,Maldah,25.091375,88.110354,district
+West Bengal,South Twenty Four Parganas,22.074293,88.632754,district
+West Bengal,Darjiling,26.826467,88.307265,district
+West Bengal,Jalpaiguri,26.6348,89.13783,district
+West Bengal,Uttar Dinajpur,25.883922,87.962685,district
+West Bengal,Purba Medinipur,22.056423,87.859253,district
+West Bengal,Haora,22.493525,88.020688,district
+West Bengal,North Twenty Four Parganas,22.733002,88.646205,district
+West Bengal,Birbhum,24.069121,87.701993,district
+Jharkhand,Jamtara,23.988953,86.908366,district
+Jharkhand,Saraikela-Kharsawan,22.819507,85.908586,district
+Jharkhand,Simdega,22.569462,84.549196,district
+Jharkhand,Latehar,23.672882,84.262712,district
+Jharkhand,Khunti,22.918776,85.269934,district
+Jharkhand,Pashchimi Singhbhum,22.431554,85.540838,district
+Jharkhand,Hazaribagh,23.995685,85.551481,district
+Jharkhand,Chatra,24.105489,84.869544,district
+Jharkhand,Purbi Singhbhum,22.619655,86.393235,district
+Jharkhand,Kodarma,24.543632,85.674872,district
+Jharkhand,Giridih,24.330754,86.161233,district
+Jharkhand,Bokaro,23.694593,85.989755,district
+Jharkhand,Deoghar,24.339428,86.715754,district
+Jharkhand,Gumla,23.16101,84.466056,district
+Jharkhand,Ramgarh,23.707959,85.520834,district
+Jharkhand,Garhwa,24.056685,83.648784,district
+Jharkhand,Ranchi,23.302671,85.383918,district
+Jharkhand,Pakur,24.531982,87.606136,district
+Bihar,Gopalganj,26.413137,84.357332,district
+Bihar,Vaishali,25.761738,85.389556,district
+Bihar,Siwan,26.125214,84.355155,district
+Bihar,Sheohar,26.487425,85.275446,district
+Bihar,Buxar,25.49251,84.106577,district
+Bihar,Madhubani,26.350224,86.213147,district
+Bihar,Supaul,26.289016,86.801033,district
+Bihar,Bhojpur,25.457581,84.556788,district
+Bihar,Darbhanga,26.084321,86.032576,district
+Bihar,Samastipur,25.762223,85.877918,district
+Bihar,Kaimur (Bhabua),24.976354,83.578989,district
+Bihar,Rohtas,24.936761,84.018497,district
+Bihar,Khagaria,25.485522,86.604177,district
+Jharkhand,Lohardaga,23.477314,84.687087,district
+Jharkhand,Sahibganj,25.024775,87.702792,district
+Jharkhand,Godda,24.873108,87.314674,district
+Jharkhand,Palamu,24.210714,84.182734,district
+Bihar,Arwal,25.197495,84.697536,district
+Bihar,Bhagalpur,25.279807,87.126522,district
+Bihar,Purnia,25.786788,87.412694,district
+Bihar,Madhepura,25.765148,86.929685,district
+Bihar,Munger,25.212616,86.520601,district
+Bihar,Sitamarhi,26.573357,85.59743,district
+Bihar,Purba Champaran,26.618424,84.896031,district
+Bihar,Lakhisarai,25.136809,86.150992,district
+Bihar,Jamui,24.75675,86.303005,district
+Bihar,Begusarai,25.504134,86.070224,district
+Bihar,Nalanda,25.206776,85.465002,district
+Bihar,Katihar,25.565703,87.658177,district
+NCT of Delhi,West,28.650561,77.081793,district
+Haryana,Mewat,27.99514,77.048833,district
+Haryana,Jhajjar,28.607415,76.664959,district
+Haryana,Bhiwani,28.732822,75.972758,district
+Haryana,Kaithal,29.856669,76.462983,district
+Uttar Pradesh,Siddharthnagar,27.262141,82.848336,district
+Uttar Pradesh,Sant Kabir Nagar,26.759397,83.025139,district
+Jharkhand,Dhanbad,23.839189,86.471904,district
+Jharkhand,Dumka,24.309058,87.307246,district
+Bihar,Kishanganj,26.258295,87.902333,district
+Bihar,Gaya,24.684698,85.014714,district
+Bihar,Banka,24.83419,86.808482,district
+Bihar,Aurangabad,24.810359,84.440033,district
+Bihar,Nawada,24.831011,85.654267,district
+Bihar,Araria,26.220788,87.378388,district
+Bihar,Pashchim Champaran,27.041213,84.352285,district
+Bihar,Muzaffarpur,26.164877,85.310578,district
+Bihar,Saran,25.921577,84.780986,district
+NCT of Delhi,New Delhi,28.61235,77.211615,district
+Haryana,Sonipat,29.0552,76.937293,district
+Haryana,Karnal,29.713447,76.903715,district
+Haryana,Kurukshetra,30.059843,76.759932,district
+Haryana,Jind,29.449804,76.385029,district
+Haryana,Panipat,29.336485,76.887834,district
+Haryana,Mahendragarh,28.132274,76.169014,district
+Haryana,Fatehabad,29.537308,75.575491,district
+Punjab,Shahid Bhagat Singh Nagar,31.128417,76.158272,district
+Karnataka,Mandya,12.632018,76.734245,district
+Karnataka,Mysore,12.169053,76.499162,district
+Karnataka,Chikkaballapura,13.600073,77.785608,district
+Karnataka,Yadgir,16.578621,76.945267,district
+Karnataka,Chikmagalur,13.422959,75.642603,district
+Karnataka,Chitradurga,14.305143,76.531915,district
+Karnataka,Haveri,14.71852,75.368408,district
+Karnataka,Dakshina Kannada,12.820148,75.233551,district
+Karnataka,Raichur,16.053573,76.906026,district
+Karnataka,Kolar,13.180188,78.256103,district
+Karnataka,Bijapur,16.811677,75.868637,district
+Karnataka,Uttara Kannada,14.732945,74.655951,district
+Karnataka,Davanagere,14.365789,75.887977,district
+Karnataka,Dharwad,15.366671,75.148655,district
+Karnataka,Bidar,18.019507,77.255185,district
+Karnataka,Chamarajanagar,11.949888,77.12297,district
+Karnataka,Gulbarga,17.244859,76.786504,district
+Karnataka,Gadag,15.418337,75.682949,district
+Karnataka,Udupi,13.559778,74.883983,district
+Karnataka,Bagalkot,16.290558,75.562782,district
+Karnataka,Hassan,13.026569,76.120761,district
+Karnataka,Shimoga,14.058974,75.111876,district
+Karnataka,Bellary,15.197467,76.718921,district
+Karnataka,Kodagu,12.374491,75.67721,district
+NCT of Delhi,East,28.625303,77.294673,district
+NCT of Delhi,South,28.509752,77.259305,district
+NCT of Delhi,North West,28.772482,77.070348,district
+NCT of Delhi,South West,28.575595,77.014633,district
+Haryana,Faridabad,28.356099,77.327867,district
+Haryana,Sirsa,29.604778,74.898353,district
+Haryana,Hisar,29.238277,75.807803,district
+Karnataka,Bangalore Rural,13.172546,77.340949,district
+Karnataka,Tumkur,13.41645,76.88243,district
+Karnataka,Belgaum,16.160262,74.886074,district
+Karnataka,Koppal,15.582112,76.283652,district
+Karnataka,Bangalore,12.944444,77.535234,district
+Karnataka,Ramanagara,12.720007,77.319387,district
+Maharashtra,Washim,20.306408,77.237388,district
+Maharashtra,Ahmadnagar,19.168483,74.830182,district
+Maharashtra,Latur,18.351014,76.760383,district
+Maharashtra,Solapur,17.850928,75.271495,district
+Maharashtra,Nashik,20.237696,74.178918,district
+Maharashtra,Osmanabad,18.174119,76.120359,district
+Maharashtra,Sindhudurg,16.123206,73.653295,district
+Maharashtra,Kolhapur,16.464307,74.089747,district
+Maharashtra,Chandrapur,20.097082,79.507606,district
+Maharashtra,Akola,20.767669,77.191544,district
+Maharashtra,Parbhani,19.290028,76.621939,district
+Maharashtra,Yavatmal,20.068228,78.343022,district
+Maharashtra,Nanded,19.092453,77.482562,district
+Maharashtra,Dhule,21.118385,74.450308,district
+Maharashtra,Satara,17.65156,74.292295,district
+Maharashtra,Sangli,17.163781,74.57665,district
+Maharashtra,Hingoli,19.625262,77.194669,district
+Maharashtra,Pune,18.624843,73.905932,district
+NCT of Delhi,Central,28.641308,77.231877,district
+Haryana,Rewari,28.220018,76.552091,district
+Haryana,Rohtak,28.892332,76.55848,district
+Haryana,Ambala,30.340517,76.950656,district
+Chandigarh,Chandigarh,30.726225,76.787816,district
+Maharashtra,Gondiya,21.14406,80.269717,district
+Maharashtra,Amravati,21.155044,77.637545,district
+Maharashtra,Nandurbar,21.528797,74.544891,district
+Maharashtra,Ratnagiri,17.287135,73.468959,district
+Maharashtra,Wardha,20.828041,78.594939,district
+Maharashtra,Aurangabad,20.009715,75.142808,district
+Maharashtra,Buldana,20.55781,76.401661,district
+Maharashtra,Gadchiroli,19.755111,80.169817,district
+Maharashtra,Jalgaon,20.857241,75.541085,district
+Maharashtra,Raigarh,18.480317,73.13784,district
+Maharashtra,Bhandara,21.121878,79.794808,district
+Maharashtra,Bid,18.982787,75.653728,district
+Maharashtra,Jalna,19.953796,75.836036,district
+Maharashtra,Thane,19.359132,73.361859,district
+Maharashtra,Palghar,19.764457,73.065908,district
+Uttar Pradesh,Varanasi,25.37518,82.94622,district
+NCT of Delhi,North East,28.725938,77.26077,district
+Punjab,Patiala,30.210805,76.343256,district
+Punjab,Tarn Taran,31.331514,74.844374,district
+Punjab,Kapurthala,31.387991,75.313082,district
+Punjab,Fatehgarh Sahib,30.656231,76.376112,district
+Punjab,Sangrur,30.209625,75.818628,district
+Pondicherry,Yanam,16.67441,82.274325,district
+Manipur,Tamenglong,24.982428,93.506651,district
+Uttar Pradesh,Bara Banki,26.94026,81.381818,district
+Uttar Pradesh,Mahoba,25.35172,79.698811,district
+Uttar Pradesh,Mahrajganj,27.180241,83.47975,district
+Uttar Pradesh,Mirzapur,24.929471,82.644157,district
+Uttar Pradesh,Kushinagar,26.92603,83.842326,district
+NCT of Delhi,North,28.723708,77.224167,district
+Haryana,Gurgaon,28.370474,76.942466,district
+Haryana,Yamunanagar,30.217763,77.32698,district
+Haryana,Palwal,28.062171,77.323591,district
+Haryana,Panchkula,30.691368,76.989656,district
+Mizoram,Mamit,23.754031,92.433345,district
+Manipur,Chandel,24.238128,94.107508,district
+Uttar Pradesh,Deoria,26.428836,83.764639,district
+Uttar Pradesh,Unnao,26.572032,80.618483,district
+Uttar Pradesh,Fatehpur,25.834465,80.925674,district
+Uttar Pradesh,Mau,26.036626,83.516653,district
+Uttar Pradesh,Rae Bareli,26.208636,81.13499,district
+Uttar Pradesh,Amethi,26.345601,81.636537,district
+Uttar Pradesh,Ghaziabad,28.768263,77.465514,district
+Uttar Pradesh,Muzaffarnagar,29.444694,77.742723,district
+Uttar Pradesh,Gautam Buddha Nagar,28.358666,77.57101,district
+Uttar Pradesh,Saharanpur,29.979917,77.500483,district
+Uttar Pradesh,Etawah,26.715267,79.086239,district
+Uttar Pradesh,Agra,27.073492,77.901939,district
+Tamil Nadu,Cuddalore,11.518616,79.339359,district
+Punjab,Pathankot,32.302757,75.658285,district
+Punjab,Gurdaspur,31.900871,75.237398,district
+Punjab,Mansa,29.881492,75.488127,district
+Punjab,Amritsar,31.76105,74.829717,district
+Nagaland,Kohima,25.77795,94.136546,district
+Nagaland,Wokha,26.270167,94.212789,district
+Nagaland,Zunheboto,26.021088,94.513441,district
+Nagaland,Kiphire,25.79737,94.865544,district
+Punjab,Faridkot,30.598993,74.798758,district
+Punjab,Ludhiana,30.783449,75.827594,district
+Punjab,Bathinda,30.174525,75.037521,district
+Punjab,Jalandhar,31.291731,75.578986,district
+Punjab,Moga,30.798495,75.163769,district
+Punjab,Hoshiarpur,31.604494,75.858263,district
+Nagaland,Dimapur,25.825609,93.904762,district
+Nagaland,Peren,25.45415,93.58253,district
+Arunachal Pradesh,Lohit,27.915764,96.309466,district
+Arunachal Pradesh,West Siang,28.260087,94.658315,district
+Arunachal Pradesh,Upper Subansiri,28.238897,94.075636,district
+Arunachal Pradesh,Changlang,27.299225,96.09942,district
+Arunachal Pradesh,Tirap,26.962927,95.448673,district
+Arunachal Pradesh,Lower Subansiri,27.640218,93.972416,district
+Arunachal Pradesh,East Kameng,27.425921,93.103983,district
+Arunachal Pradesh,Upper Siang,28.73007,95.024862,district
+Arunachal Pradesh,Anjaw,28.021984,96.837741,district
+Arunachal Pradesh,East Siang,28.115967,95.236188,district
+Arunachal Pradesh,Dibang Valley,28.868845,95.953514,district
+Arunachal Pradesh,Kurung Kumey,27.97665,93.332371,district
+Arunachal Pradesh,West Kameng,27.31162,92.435254,district
+Arunachal Pradesh,Lower Dibang Valley,28.224861,95.887901,district
+Arunachal Pradesh,Tawang,27.662234,91.928042,district
+Arunachal Pradesh,Papum Pare,27.279839,93.606805,district
+Assam,Goalpara,26.0662,90.62661,district
+Assam,Baksa,26.655266,91.323684,district
+Assam,Nagaon,26.25276,92.664807,district
+Tamil Nadu,Pudukkottai,10.289844,78.815814,district
+Tamil Nadu,Vellore,12.732322,78.812554,district
+Uttar Pradesh,Chandauli,25.12266,83.247528,district
+Punjab,Muktsar,30.283951,74.52327,district
+Punjab,Rupnagar,31.093823,76.530724,district
+Punjab,Firozpur,30.943287,74.749127,district
+Punjab,Fazilka,30.36596,74.097439,district
+Tripura,West Tripura,23.915266,91.409004,district
+Punjab,Barnala,30.371362,75.506325,district
+Punjab,Sahibzada Ajit Singh Nagar,30.645835,76.749697,district
+Maharashtra,Mumbai,18.970701,72.828707,district
+Mizoram,Lunglei,22.939816,92.752849,district
+Mizoram,Kolasib,24.172896,92.707912,district
+Mizoram,Lawngtlai,22.361761,92.713119,district
+Mizoram,Saiha,22.282003,93.012131,district
+Mizoram,Champhai,23.543172,93.209061,district
+Tripura,Dhalai,23.822123,91.977614,district
+Tripura,Unokoti,24.190514,92.053723,district
+Tripura,North Tripura,24.094059,92.236777,district
+Tripura,Gomati,23.437357,91.630076,district
+Tripura,South Tripura,23.180769,91.640075,district
+Meghalaya,South Garo Hills,25.347468,90.554848,district
+Meghalaya,Ribhoi,25.859902,91.852609,district
+Meghalaya,East Khasi Hills,25.404928,91.851384,district
+Meghalaya,West Khasi Hills,25.55935,91.27305,district
+Meghalaya,South West Khasi Hills,25.31863,91.308864,district
+Meghalaya,West Garo Hills,25.609568,90.211487,district
+Uttar Pradesh,Jhansi,25.524543,78.653551,district
+Uttar Pradesh,Banda,25.440334,80.521583,district
+Uttar Pradesh,Sonbhadra,24.396282,83.084027,district
+Uttar Pradesh,Lalitpur,24.696782,78.519646,district
+Uttar Pradesh,Ghazipur,25.602614,83.511485,district
+Tamil Nadu,Krishnagiri,12.513507,78.23696,district
+Tamil Nadu,Erode,11.48173,77.351599,district
+Tamil Nadu,Coimbatore,10.812558,77.099791,district
+Telangana,Warangal (R),17.927524,79.822323,district
+Mizoram,Serchhip,23.288327,92.833502,district
+Mizoram,Aizawl,23.852513,92.989016,district
+Maharashtra,Mumbai Suburban,19.129968,72.898151,district
+Maharashtra,Nagpur,21.150252,79.02069,district
+Goa,North Goa,15.533357,74.019328,district
+Goa,South Goa,15.191554,74.124649,district
+Andaman & Nicobar Islands,North  & Middle Andaman,12.186323,92.810524,district
+Andaman & Nicobar Islands,South Andaman,10.70605,92.489169,district
+Andaman & Nicobar Islands,Nicobars,6.997665,93.817283,district
+Orissa,Anugul,21.106706,84.957387,district
+Pondicherry,Karaikal,10.915242,79.830669,district
+Pondicherry,Puducherry,11.923685,79.781759,district
+Pondicherry,Mahe,11.700943,75.536937,district
+Manipur,Ukhrul,25.088914,94.440007,district
+Manipur,Bishnupur,24.520869,93.793356,district
+Manipur,Churachandpur,24.311432,93.446856,district
+Manipur,Thoubal,24.494336,93.955533,district
+Manipur,Imphal East,24.869217,94.039077,district
+Manipur,Senapati,25.135908,93.951157,district
+Manipur,Imphal West,24.768486,93.857485,district
+Nagaland,Mon,26.661478,95.004752,district
+Nagaland,Tuensang,26.166872,94.913317,district
+Nagaland,Mokokchung,26.493997,94.547889,district
+Nagaland,Longleng,26.6055,94.816006,district
+Nagaland,Phek,25.662524,94.381567,district
+Assam,Nalbari,26.37097,91.375154,district
+Assam,Dhubri,25.954485,89.972924,district
+Assam,Sivasagar,26.973744,94.771969,district
+Assam,Karimganj,24.572454,92.376407,district
+Assam,Tinsukia,27.613539,95.558065,district
+Orissa,Koraput,18.72546,82.595417,district
+Assam,Hailakandi,24.497762,92.627176,district
+Orissa,Nabarangapur,19.609024,82.299999,district
+Orissa,Bargarh,21.226864,83.566804,district
+Assam,Chirang,26.644867,90.629791,district
+Assam,Cachar,24.751001,92.883475,district
+Assam,Darrang,26.432744,91.976821,district
+Assam,Kamrup,26.159747,91.281572,district
+Assam,Dibrugarh,27.371124,95.07156,district
+Assam,Barpeta,26.353576,91.060004,district
+Orissa,Balangir,20.607845,83.169443,district
+Assam,Dhemaji,27.572283,94.69657,district
+Assam,Sonitpur,26.765318,92.837321,district
+Assam,Udalguri,26.719333,92.031552,district
+Rajasthan,Jhunjhunun,28.079406,75.522168,district
+Rajasthan,Jaisalmer,27.033624,70.797298,district
+Rajasthan,Sikar,27.659204,75.04143,district
+Rajasthan,Hanumangarh,29.36323,74.212368,district
+Rajasthan,Nagaur,27.052125,74.200627,district
+Rajasthan,Barmer,25.601923,71.683556,district
+Rajasthan,Ganganagar,29.457484,73.530366,district
+Rajasthan,Jodhpur,26.754485,72.870304,district
+Rajasthan,Churu,28.20289,74.694974,district
+Rajasthan,Bikaner,28.100375,73.110152,district
+Rajasthan,Pratapgarh,24.022944,74.664497,district
+Assam,Morigaon,26.279304,92.284553,district
+Assam,Karbi Anglong,26.069228,93.420302,district
+Assam,Lakhimpur,27.140298,94.128473,district
+Assam,Golaghat,26.282525,93.983497,district
+Assam,Dima Hasao,25.402676,93.037467,district
+Rajasthan,Pali,25.600551,73.443837,district
+Rajasthan,Rajsamand,25.371802,73.858171,district
+Rajasthan,Ajmer,26.316573,74.699463,district
+Rajasthan,Bharatpur,27.267057,77.374418,district
+Rajasthan,Dungarpur,23.669096,73.818033,district
+Rajasthan,Chittaurgarh,24.7148,74.483289,district
+Rajasthan,Udaipur,24.47244,73.666634,district
+Rajasthan,Jalor,25.201028,72.313386,district
+Rajasthan,Dausa,26.800312,76.42548,district
+Rajasthan,Sirohi,24.80531,72.827779,district
+Assam,Bongaigaon,26.36236,90.611896,district
+Meghalaya,West Jaintia Hills,25.441424,92.188692,district
+Tamil Nadu,Sivaganga,9.965836,78.71883,district
+Tamil Nadu,Thanjavur,10.659714,79.195472,district
+Tamil Nadu,Tiruvannamalai,12.426594,79.002126,district
+Assam,Kamrup Metropolitan,26.053456,91.980425,district
+Tamil Nadu,Ramanathapuram,9.519499,78.520457,district
+Tamil Nadu,Tirunelveli,8.780284,77.531125,district
+Tamil Nadu,Virudhunagar,9.49065,77.866049,district
+Assam,Kokrajhar,26.52828,90.141209,district
+Assam,Jorhat,26.800661,94.189374,district
+Tripura,Khowai,23.960807,91.649379,district
+Tripura,Sipahijula,23.539561,91.309034,district
+Meghalaya,East Garo Hills,25.633831,90.664668,district
+Meghalaya,North Garo Hills,25.86506,90.708117,district
+Orissa,Subarnapur,20.851958,83.840952,district
+Orissa,Puri,19.827213,85.633372,district
+Orissa,Debagarh,21.439019,84.690951,district
+Meghalaya,South West Garo Hills,25.438837,89.92398,district
+Meghalaya,East Jaintia Hills,25.276417,92.483545,district
+Orissa,Jagatsinghapur,20.174016,86.336659,district
+Orissa,Kandhamal,20.138012,84.079609,district
+Orissa,Khordha,20.054852,85.502444,district
+Orissa,Mayurbhanj,21.903163,86.412708,district
+Orissa,Malkangiri,18.272627,81.956532,district
+Orissa,Baleshwar,21.521661,86.878134,district
+Orissa,Sambalpur,21.561538,84.156419,district
+Orissa,Gajapati,19.191395,84.197662,district
+Orissa,Dhenkanal,20.832711,85.639947,district
+Orissa,Nayagarh,20.233479,85.017094,district
+Orissa,Cuttack,20.385806,85.537001,district
+Orissa,Jajapur,20.867438,86.125979,district
+Orissa,Kalahandi,19.822473,83.053347,district
+Orissa,Baudh,20.65521,84.006595,district
+Orissa,Kendrapara,20.556529,86.536961,district
+Orissa,Kendujhar,21.592083,85.665773,district
+Orissa,Ganjam,19.605889,84.7033,district
+Orissa,Sundargarh,22.05063,84.865954,district
+Orissa,Bhadrak,20.997462,86.597526,district
+Orissa,Nuapada,20.542746,82.527679,district
+Orissa,Rayagada,19.442444,83.580023,district
+Orissa,Jharsuguda,21.803763,84.017608,district
+Chhatisgarh,Bemetra,21.677321,81.429324,district
+Chhatisgarh,Bastar,19.121285,81.851437,district
+Tamil Nadu,Thiruvarur,10.64368,79.521206,district
+Tamil Nadu,Thiruvallur,13.255297,80.056943,district
+Chhatisgarh,Mungeli,22.208494,81.626507,district
+Chhatisgarh,Bilaspur,22.392129,82.016918,district
+Chhatisgarh,Gariaband,20.442619,82.24886,district
+Chhatisgarh,Kabeerdham,22.113513,81.249565,district
+Chhatisgarh,Sukma,18.282448,81.320656,district
+Chhatisgarh,Uttar Bastar Kanker,20.122152,80.983063,district
+Chhatisgarh,Baloda Bazar,21.526812,82.348443,district
+Chhatisgarh,Balod,20.727686,81.147586,district
+Tamil Nadu,Tiruchirappalli,10.851466,78.728312,district
+Tamil Nadu,Tiruppur,10.795246,77.536465,district
+Tamil Nadu,Madurai,9.934404,78.012745,district
+Tamil Nadu,Karur,10.824679,78.384804,district
+Tamil Nadu,Dharmapuri,12.16148,78.12855,district
+Tamil Nadu,Namakkal,11.300581,78.123279,district
+Uttar Pradesh,Moradabad,28.888054,78.790385,district
+Uttar Pradesh,Sambhal,28.42595,78.552539,district
+Uttar Pradesh,Budaun,28.065775,79.036019,district
+Uttar Pradesh,Kanshiram Nagar,27.796067,78.822787,district
+Uttar Pradesh,Bahraich,27.733548,81.475627,district
+Uttar Pradesh,Hapur,28.707006,77.911092,district
+Uttar Pradesh,Sitapur,27.503163,80.835556,district
+Uttar Pradesh,Samli,29.474881,77.283996,district
+Chhatisgarh,Dakshin Bastar Dantewada,18.819706,81.413562,district
+Chhatisgarh,Surguja,22.953808,83.047724,district
+Chhatisgarh,Balrampur,23.629013,83.491582,district
+Chhatisgarh,Kondagaon,19.708241,81.755212,district
+Uttar Pradesh,Shrawasti,27.677879,81.886813,district
+Chhatisgarh,Narayanpur,19.581322,81.108038,district
+Chhatisgarh,Durg,21.186883,81.410334,district
+Chhatisgarh,Surajpur,23.43214,83.016146,district
+Chhatisgarh,Bijapur,18.772934,80.745931,district
+Uttar Pradesh,Mathura,27.596399,77.603796,district
+Uttar Pradesh,Etah,27.54803,78.708673,district
+Uttar Pradesh,Hardoi,27.337872,80.100374,district
+Uttar Pradesh,Balrampur,27.446689,82.404602,district
+Uttar Pradesh,Mahamaya Nagar,27.545524,78.083673,district
+Uttar Pradesh,Shahjahanpur,27.920023,79.747272,district
+Uttar Pradesh,Farrukhabad,27.437824,79.499345,district
+Uttar Pradesh,Kannauj,26.998516,79.693012,district
+Uttar Pradesh,Pilibhit,28.500013,80.090063,district
+Uttar Pradesh,Mainpuri,27.213894,79.050988,district
+Uttar Pradesh,Jyotiba Phule Nagar,28.744816,78.280515,district
+Chhatisgarh,Raipur,21.281479,81.811556,district
+Chhatisgarh,Koriya,23.425733,82.319837,district
+Chhatisgarh,Dhamtari,20.535876,81.717092,district
+Chhatisgarh,Korba,22.517239,82.635951,district
+Chhatisgarh,Raigarh,22.065974,83.281272,district
+Chhatisgarh,Jashpur,22.764693,83.95549,district
+Chhatisgarh,Mahasamund,21.187959,82.613792,district
+Chhatisgarh,Rajnandgaon,20.971725,80.697869,district
+Chhatisgarh,Janjgir-Champa,21.942891,82.706633,district
+Rajasthan,Bhilwara,25.484066,74.712133,district
+Rajasthan,Tonk,26.126337,75.666803,district
+Rajasthan,Bundi,25.437526,75.745488,district
+Rajasthan,Jaipur,27.148631,75.768023,district
+Rajasthan,Kota,25.186462,76.007675,district
+Tamil Nadu,Ariyalur,11.152162,79.262241,district
+Tamil Nadu,Theni,9.866557,77.43317,district
+Tamil Nadu,Salem,11.643518,78.208188,district
+Uttar Pradesh,Firozabad,27.192054,78.488795,district
+Uttar Pradesh,Sultanpur,26.242008,82.291491,district
+Uttar Pradesh,Chitrakoot,25.21384,81.159192,district
+Uttar Pradesh,Basti,26.842448,82.522311,district
+Uttar Pradesh,Gorakhpur,26.680208,83.370902,district
+Uttar Pradesh,Lucknow,26.83048,80.918176,district
+Uttar Pradesh,Azamgarh,26.031617,83.035139,district
+Uttar Pradesh,Faizabad,26.636957,82.039739,district
+Tamil Nadu,Perambalur,11.289764,78.931982,district
+Tamil Nadu,Dindigul,10.424314,77.817084,district
+Uttar Pradesh,Meerut,28.99916,77.780823,district
+Uttar Pradesh,Aligarh,27.879321,78.142277,district
+Uttar Pradesh,Bulandshahr,28.359479,77.964295,district
+Uttar Pradesh,Bijnor,29.410618,78.496628,district
+Uttar Pradesh,Baghpat,29.037583,77.309953,district
+Uttar Pradesh,Kheri,28.184353,80.716637,district
+Uttar Pradesh,Rampur,28.779435,79.19131,district
+Uttar Pradesh,Bareilly,28.462004,79.400642,district
+Uttar Pradesh,Kaushambi,25.534588,81.458119,district
+Uttar Pradesh,Jalaun,26.106247,79.384862,district
+Uttar Pradesh,Auraiya,26.656192,79.516432,district
+Uttar Pradesh,Pratapgarh,25.871283,81.833217,district
+Uttar Pradesh,Hamirpur,25.814338,79.866962,district
+Uttar Pradesh,Gonda,27.111095,81.943092,district
+Uttar Pradesh,Kanpur Dehat,26.458318,79.865666,district
+Uttar Pradesh,Jaunpur,25.796449,82.494408,district
+Tamil Nadu,Chennai,13.057876,80.235738,district
+Tamil Nadu,Nagapattinam,11.188965,79.694007,district
+Tamil Nadu,Viluppuram,11.977116,79.169505,district
+Tamil Nadu,Kancheepuram,12.643699,79.921224,district
+Rajasthan,Banswara,23.49185,74.377477,district
+Tamil Nadu,Kanniyakumari,8.328071,77.367725,district
+Tamil Nadu,Thoothukkudi,8.846387,77.994121,district
+Uttar Pradesh,Allahabad,25.28015,81.885306,district
+Tamil Nadu,The Nilgiris,11.435256,76.69873,district
+Rajasthan,Jhalawar,24.32697,76.521086,district
+Rajasthan,Alwar,27.640818,76.615427,district
+Rajasthan,Baran,24.919639,76.696219,district
+Rajasthan,Karauli,26.504408,77.081083,district
+Rajasthan,Dhaulpur,26.651638,77.626426,district
+Rajasthan,Sawai Madhopur,26.200935,76.31065,district
+Telangana,Jangaon,17.820598,79.208081,district
+Telangana,Mancherial,18.989014,79.519597,district
+Telangana,Bhadradri,17.709933,80.922232,district
+Telangana,Hydrabad,17.414391,78.467419,district
+Telangana,Karimnagar,18.405431,79.215595,district
+Telangana,Nizamabad,18.711655,78.221134,district
+Telangana,Medak,17.954175,78.160918,district
+Telangana,Rangareddy,17.137011,78.399367,district
+Telangana,Nalgonda,16.86609,79.225516,district
+Telangana,Nagarkurnool,16.412233,78.684226,district
+Telangana,Adilabad,19.53738,78.627549,district
+Telangana,Komaram Bheem,19.34109,79.42243,district
+Telangana,Nirmal,19.099659,78.373629,district
+Telangana,Jagtial,18.811715,78.936212,district
+Telangana,Kamareddy,18.319358,78.059962,district
+Telangana,Warangal (U),18.028923,79.532839,district
+Telangana,Jayashankar,18.44609,80.149833,district
+Telangana,Peddapalli,18.627698,79.498859,district
+Telangana,Rajanna Sircilla,18.431943,78.766311,district
+Telangana,Sangareddy,17.850894,77.825822,district
+Telangana,Siddipet,18.040017,78.906387,district
+Telangana,Mahabubabad,17.729053,80.059484,district
+Telangana,Khammam,17.188143,80.397471,district
+Telangana,Suryapet,17.081912,79.798934,district
+Telangana,Jogulamba,16.084209,77.735495,district
+Telangana,Yadadri,17.428539,79.090363,district
+Telangana,Medchal,17.528636,78.532669,district
+Telangana,Wanaparthy,16.272009,78.004623,district
+Telangana,Vikarabad,17.272631,77.73688,district
+Telangana,Mahabubnagar,16.69346,77.822018,district
+Ladakh,Kargil,33.807577,76.437948,district
+Ladakh,Leh (Ladakh),34.166031,78.089949,district
+Andaman & Nicobar Islands,,6.997665,93.817283,state
+Andhra Pradesh,,15.923121,79.636154,state
+Arunachal Pradesh,,28.083368,95.13962,state
+Assam,,26.250034,91.924007,state
+Bihar,,25.843117,86.186721,state
+Chandigarh,,30.726225,76.787816,state
+Chhatisgarh,,20.956858,81.503761,state
+Dadra & Nagar Haveli,,20.200874,73.010035,state
+Daman & Diu,,20.72226,70.930365,state
+Goa,,15.354858,74.102949,state
+Gujarat,,22.371904,71.506825,state
+Haryana,,29.280257,76.28094,state
+Himachal Pradesh,,31.822428,77.344103,state
+Jammu & Kashmir,,34.682728,74.975646,state
+Jharkhand,,23.715401,85.162313,state
+Karnataka,,14.964139,75.470947,state
+Kerala,,10.546653,76.432,state
+Ladakh,,34.155691,77.596968,state
+Lakshadweep,,11.158571,72.047414,state
+Madhya Pradesh,,23.998299,79.392739,state
+Maharashtra,,18.850111,75.374064,state
+Manipur,,24.801254,93.919459,state
+Meghalaya,,25.623226,91.272769,state
+Mizoram,,23.234982,92.882506,state
+NCT of Delhi,,28.643784,77.126059,state
+Nagaland,,26.086648,94.589922,state
+Orissa,,20.182295,84.449882,state
+Pondicherry,,11.923685,79.781759,state
+Punjab,,31.033837,75.582358,state
+Rajasthan,,26.633654,74.133375,state
+Sikkim,,27.610256,88.459157,state
+Tamil Nadu,,10.80734,78.380245,state
+Telangana,,17.882751,80.058379,state
+Tripura,,23.758113,91.588115,state
+Uttar Pradesh,,27.164491,80.783673,state
+Uttarakhand,,30.082539,79.295964,state
+West Bengal,,24.392995,88.105728,state

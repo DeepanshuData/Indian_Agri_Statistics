@@ -2,6 +2,11 @@
 .venv/
 __pycache__/
 *.pyc
+/.ipython/
+/.vscode/
 
 output/*.csv
 output/*.json
+output/*.geojson
+# Raw GIS source data
+gis_data/
