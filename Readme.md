@@ -50,24 +50,31 @@ district-area comparisons when those result files are available.
 
 ### 2. What Should I Grow?
 
-Rank crops with historical district and season yields, land size, budget,
-reference crop economics, and irrigation availability. Optionally include the
-current five-day weather-risk category in the ranking.
+Compare district-season crop performance using production divided by area,
+reported in the source units. The table also shows observation coverage,
+reference growing costs, budget fit, irrigation risk, and optional five-day
+weather risk. The historical comparison is not a profit ranking or planting
+recommendation.
 
 ### 3. Profitability
 
-Estimate production, revenue, costs, profit, ROI, and price risk for a crop.
-Land, sale price, and cost per acre are editable assumptions.
+Estimate revenue, costs, profit, and ROI for a crop using a harvest quantity
+entered directly in kilograms. Land, selling price, and growing cost are
+editable scenario assumptions. Historical yield is shown for context only.
 
 ```text
-Expected production = Historical yield × Land area
-Expected revenue    = Expected production × Assumed selling price
+Expected revenue    = Entered harvest (kg) × Assumed selling price (₹/kg)
+Estimated cost      = Land (acres) × Assumed growing cost (₹/acre)
 Expected profit     = Expected revenue − Estimated cost
 ROI                 = Expected profit ÷ Estimated cost × 100
 ```
 
-The application converts acres to hectares and tonnes to kilograms when
-combining the agriculture yield data with prices per kilogram.
+The source area, production, and yield units are currently unverified. For
+that reason, the crop comparison does not convert historical yields into
+money, and the profitability calculator uses only the harvest amount entered
+by the user. Source-yield-based production estimates remain unavailable until
+`config/agriculture_source_metadata.csv` contains authoritative evidence and
+compatible verified units. Dashboard labels use neutral source-unit wording.
 The dashboard's average yield is area-weighted across records with valid
 positive area and yield values.
 
@@ -94,11 +101,25 @@ category. The view labels state-level coordinate fallbacks as approximate.
   coverage, then review the ranked coverage chart and underlying results.
 - The interactive outline map uses the districts in the supplied spatial
   export; it does not claim complete coverage of every current district.
+- The large river-boundary map is simplified and cached locally after its
+  initial load, so navigating back to the GIS page does not repeat the full
+  geometry preparation.
 - Review the initial comparison of calculated district areas with Census 2011
   reference areas.
 - Results are generated with PostgreSQL/PostGIS and exported to CSV for the
   application. The GIS view is optional and does not require a live database
   connection when the result file is present.
+- Open **India Rice Yield GIS** in the app's Geospatial navigation to explore
+  the 735-district Rice yield map, filter by state and district, review all six
+  pipeline charts, inspect data quality and unresolved matches, and download
+  the map, QGIS project, GeoPackage, summaries, and analysis report. It reads
+  the generated files under `output/csv/`, `output/maps/`, and
+  `output/reports/`; run the GIS pipeline first if those outputs are missing.
+  Area and production units remain unverified, and unmatched districts remain
+  visibly unclassified rather than being assigned zero. In the screenshot run,
+  401 of 647 agricultural district summaries matched the 735 boundary
+  features; unresolved summaries are listed for review and these counts may
+  change when the source data or verified crosswalk changes.
 
 ### 7. Crop DNA
 
@@ -109,6 +130,27 @@ to district coordinates. It is not a genetic profile or live field-monitoring
 system: the project does not include genomic traits, farm parcel boundaries,
 NDVI, soil sensors, or irrigation observations, and the map does not infer
 those values.
+
+## 🖼 Project screenshots
+
+These screenshots show QGIS spatial-join exploration and the India Rice GIS
+web-app views. The QGIS farm-point examples use **synthetic sample records**;
+they are demonstrations of the spatial workflow, not observed farm locations
+or production data.
+
+### QGIS district and farm-point spatial join
+
+![QGIS district join attributes with sample farm-area fields](docs/images/qgis-district-join-table.png)
+
+![QGIS district boundaries and synthetic sample farm points](docs/images/qgis-sample-farm-spatial-join.png)
+
+### India Rice Yield GIS web app
+
+![Interactive India district Rice yield map; unmatched districts remain gray](docs/images/app-india-rice-yield-map.png)
+
+![Rice analysis charts with source-unit labels](docs/images/app-rice-analysis-charts.png)
+
+![Rice data-quality metrics and district match coverage](docs/images/app-rice-data-quality.png)
 
 ## 🧭 How the Application Works
 
@@ -137,19 +179,24 @@ Agriculture history ──> Crop DNA profile and district-coordinate view
 
 From the project root, install the dependencies and start the dashboard:
 
-```bash
-python -m pip install -r requirements.txt
-streamlit run app/app.py
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r .\requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run .\app\app.py
 ```
 
 Open the local URL printed by Streamlit (usually
-`http://localhost:8501`). The main agriculture dataset is read from
+http://localhost:8501). The main agriculture dataset is read from
 `Data/agridata.csv` or `data/agridata.csv`.
 
 Weather lookup requires an internet connection. Crop recommendations and
-profitability require `Data/crop_economics.csv`; market comparison requires
-`Data/market_data.csv`. Crop DNA profiles can use the same crop-economics
-reference file when it is available. Its district map uses
+the profitability scenario require `Data/crop_economics.csv`; market comparison
+requires `Data/market_data.csv`. Crop DNA profiles can use the same crop-economics
+reference file when it is available. Crop comparison ranks aggregated historical
+production divided by area in the dataset's source units; it does not rank
+estimated profit. The profitability scenario uses harvest kilograms entered by
+the user and does not convert the unverified historical yield into production.
+Its district map uses
 `Data/district_coordinates.csv` and historical agriculture records. The GIS &
 Spatial Analysis view reads
 `output/river_buffer_coverage_by_district.csv` and, when present,
@@ -185,6 +232,7 @@ Indian_Agri_Statistics/
 │       └── census_2011_district_areas.csv
 ├── docs/
 │   ├── district_area_comparison.md  # GIS area comparison results and limitations
+│   ├── images/                      # README project screenshots
 │   └── postgis/                     # CRS reprojection workflow
 ├── sql/
 │   └── postgis/                     # PostGIS geometry and spatial analysis queries
@@ -365,9 +413,11 @@ material.
 - `Data/district_coordinates.csv` stores representative points generated from the
   project's district boundary layer and state-level fallback points for its
   supported states.
-- Profitability and recommendations are estimates based on historical average
-  yield and the selected assumptions. They do not account for every factor
-  affecting realized farm returns.
+- Crop comparisons use historical district-season records and display yield in
+  unverified source units; they are not planting recommendations or profit
+  rankings. The profitability scenario uses a user-entered harvest amount and
+  editable price/cost assumptions, not a conversion from historical yield.
+  Neither result accounts for every factor affecting realized farm returns.
 - Weather risk is a simple indicator based on five-day rainfall and precipitation
   probability thresholds; it is not an agronomic forecast or a substitute for
   local advice.
@@ -382,6 +432,131 @@ material.
 
 Document dataset publishers, source URLs, download dates, and applicable
 licenses alongside future data updates.
+
+## 🌾 India agricultural GIS pipeline
+
+The automated workflow reuses the already completed Stage 1 import and runs
+the remaining processing, spatial integration, analysis, charting, QGIS
+mapping, and report generation. It does **not** rerun or overwrite Stage 1.
+Stage 1's `src/import_district_boundaries.py` remains available for a deliberate
+manual import.
+
+The pipeline reads `public.agriculture` and
+`public.district_boundaries`. Database connection settings come from the
+untracked project `.env` file. Do not copy passwords into source code or logs.
+
+### Run the complete workflow
+
+Open a PowerShell terminal in the project root. If dependencies have not yet
+been installed in `.venv`, run:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r .\requirements.txt
+```
+
+Create `.env` in the project root using `.env.example` as a template, then set
+the local PostgreSQL connection values. Do not commit `.env` or paste its
+password into source code, issue reports, or logs. The database must contain
+PostGIS, `public.agriculture`, the already-imported
+`public.district_boundaries` table (735 valid EPSG:4326 district geometries),
+and the 693-feature EPSG:4326 `public.indian_districts` reference used for
+spatial state assignment. The normal pipeline verifies Stage 1 and does not
+re-import or replace its boundary table.
+
+Then run:
+
+```powershell
+.\.venv\Scripts\python.exe .\main.py
+```
+
+The workflow stops and reports the error if a stage fails. It first verifies
+that Stage 1 still has 735 valid EPSG:4326 geometries and a GiST index. It does
+not modify `public.agriculture`.
+
+### Pipeline modules
+
+| File | Purpose |
+|---|---|
+| `src/import_district_boundaries.py` | Existing Stage 1 GeoPackage validation and safe PostGIS import. |
+| `src/pipeline_utils.py` | Shared database settings, output folders, and name normalization. |
+| `src/process_agriculture_data.py` | Deduplicate exact source rows, validate Rice fields/years, calculate weighted district/state summaries, and export quality counts. |
+| `src/spatial_integration.py` | Derive state labels through spatial overlay, match summaries conservatively, record unmatched cases, and create `public.rice_district_spatial`. |
+| `src/spatial_analysis.py` | Calculate top districts, state summaries, district comparisons, and geometry areas in EPSG:6933. |
+| `src/generate_charts.py` | Produce six 300-DPI Rice charts. |
+| `src/generate_qgis_map.py` | Detect QGIS Python, create a separate EPSG:7755 project and five-class Jenks map. |
+| `src/generate_report.py` | Assemble validation, findings, map, charts, methodology, and limitations into a PDF report. |
+| `main.py` | Verify completed Stage 1 and run Stages 2–7 in order. |
+
+### District matching and verified crosswalk
+
+The pipeline first matches normalized state-plus-district keys. It does not
+automatically accept a district-name-only match when the state differs, even
+when that district name has a single boundary candidate. Ambiguous names,
+state mismatches, and many-to-one relationships remain unresolved and are
+listed in `output/csv/district_match_audit.csv` and
+`output/csv/unmatched_rice_districts.csv`. Fuzzy candidates are review hints
+only; they never populate the map.
+
+To supply a verified correction, edit
+`config/verified_district_crosswalk.csv`. Keep the original agricultural
+labels, provide the corresponding boundary state/district, method, and an
+authoritative evidence citation (URL/document and relevant section or record),
+then set `verification_status` to `verified`. Pending rows are ignored.
+Verified sources and targets must each be unique, and the target must match
+exactly one boundary. Invalid verified entries stop the pipeline instead of
+being silently ignored. The applied rows are reported in
+`output/csv/verified_district_crosswalk.csv`; the config file is the durable
+input and is not overwritten by pipeline runs.
+
+Run the unit tests (they use synthetic data and do not write to PostGIS):
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -v
+```
+
+### Output locations
+
+- `output/csv/`: district/state summaries, data quality, spatial matches,
+  unmatched rows, district match audit, applied crosswalk, data dictionary,
+  and analytical datasets.
+- `output/charts/`: six high-resolution PNG charts.
+- `output/maps/`: India Rice Yield PNG, PDF, QGIS project, and the GeoPackage
+  used by that project.
+- `output/reports/Agriculture_GIS_Analysis_Report.pdf`: final report.
+- `logs/agriculture_gis_pipeline.log`: progress and error log.
+
+### Data handling and limitations
+
+The connected database contained 22,068 Rice rows, including exact duplicate
+copies of the 11,034 distinct source observations. The pipeline excludes exact
+duplicates for calculations but never deletes or changes source rows. It
+reports missing area, production, and invalid year values; missing values are
+not converted to zero. The Rice source has 32 raw rows with missing production,
+which are counted after deduplication in the quality summary.
+
+Agricultural area, production, and yield units remain **unverified**. Local CSV
+metadata and project documentation do not provide an authoritative unit
+definition; numeric magnitudes are not evidence of units. The pipeline
+calculates `total production / total area` and labels all outputs accordingly.
+Record evidence and unit definitions in
+`config/agriculture_source_metadata.csv` and see
+`docs/agriculture_data_dictionary.md`. The 735-feature district source's state
+labels do not consistently match the legacy reference. State names are derived
+from spatial overlay with `public.indian_districts`, while original source
+labels are preserved.
+
+Matching uses normalized state and district names. State conflicts, ambiguous
+names, and many-to-one matches require documentary review and are not mapped.
+Unmatched agricultural summaries remain null (not zero) and are exported for
+review. The 693-feature legacy reference and 735-feature source have different
+coverage or boundary vintages; unmatched records are not redistributed or
+invented.
+
+QGIS is launched through its own `python-qgis.bat` runtime. The program
+searches the standard Windows QGIS installation folders. To choose another
+installation, set `QGIS_PYTHON_BAT` to its full launcher path before running
+the pipeline. The QGIS project and layout are new outputs; existing QGIS
+projects, including the Nagaland layout, are not modified.
 
 ## 🔬 Current Status
 

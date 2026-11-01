@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -11,41 +12,72 @@ def canonical_crop_name(crop):
     return aliases.get(normalized, normalized)
 
 
-def get_historical_crop_yields(
-    df,
-    district,
-    season=None
-):
-    data = df[
-        df["district"].str.lower()
-        == district.lower()
+def get_historical_crop_summary(df, state, district, season=None):
+    """Aggregate valid district-season production and area before calculating yield."""
+    data = df.loc[
+        df["state"].astype("string").str.strip().str.casefold().eq(
+            str(state).strip().casefold()
+        )
+        & df["district"].astype("string").str.strip().str.casefold().eq(
+            str(district).strip().casefold()
+        )
     ].copy()
-
     if season and season != "All":
-        data = data[
-            data["season"].str.lower()
-            == season.lower()
+        data = data.loc[
+            data["season"].astype("string").str.strip().str.casefold().eq(
+                str(season).strip().casefold()
+            )
         ]
 
-    result = (
-        data.groupby("crop")["yield"]
-        .mean()
-        .reset_index()
+    data["crop"] = data["crop"].astype("string").str.strip()
+    data["year"] = data["year"].astype("string").str.strip()
+    data["area"] = pd.to_numeric(data["area"], errors="coerce")
+    data["production"] = pd.to_numeric(data["production"], errors="coerce")
+    valid_year = data["year"].str.fullmatch(r"\d{4}(?:-\d{2}|\d{4})?").fillna(False)
+    valid_values = (
+        np.isfinite(data["area"])
+        & np.isfinite(data["production"])
+        & data["area"].gt(0)
+        & data["production"].ge(0)
+        & data["crop"].notna()
+        & data["crop"].ne("")
+        & valid_year
     )
+    valid = data.loc[valid_values]
+    if valid.empty:
+        return pd.DataFrame(
+            columns=[
+                "crop",
+                "total_area",
+                "total_production",
+                "observations",
+                "years_of_history",
+                "historical_yield",
+            ]
+        )
 
-    result.columns = [
-        "crop",
-        "historical_yield"
-    ]
-
-    return result
+    summary = (
+        valid.groupby("crop", as_index=False)
+        .agg(
+            total_area=("area", "sum"),
+            total_production=("production", "sum"),
+            observations=("crop", "size"),
+            years_of_history=("year", "nunique"),
+        )
+    )
+    summary["historical_yield"] = (
+        summary["total_production"] / summary["total_area"]
+    )
+    return summary.sort_values(
+        ["historical_yield", "crop"], ascending=[False, True]
+    ).reset_index(drop=True)
 
 
 def calculate_risk(
     price_volatility,
     water_requirement,
     irrigation,
-    weather_risk=None
+    weather_risk=None,
 ):
     score = 0
 
@@ -80,138 +112,3 @@ def calculate_risk(
         return "Medium"
 
     return "Low"
-
-
-def recommend_crops(
-    df,
-    economics,
-    district,
-    land_acres,
-    budget,
-    irrigation,
-    season,
-    weather_risk=None
-):
-    yields = get_historical_crop_yields(
-        df,
-        district,
-        season
-    )
-
-    recommendations = []
-
-    for _, row in yields.iterrows():
-
-        crop = row["crop"]
-        historical_yield = row["historical_yield"]
-
-        if pd.isna(historical_yield):
-            continue
-
-        economic_result = economics[
-            economics["crop"].map(canonical_crop_name)
-            == canonical_crop_name(crop)
-        ]
-
-        if economic_result.empty:
-            continue
-
-        economic_result = economic_result.iloc[0]
-
-        cost_per_acre = economic_result[
-            "cost_per_acre"
-        ]
-
-        total_cost = (
-            cost_per_acre * land_acres
-        )
-
-        if total_cost > budget:
-            continue
-
-        price_volatility = economic_result[
-            "price_volatility"
-        ]
-
-        water_requirement = economic_result[
-            "water_requirement"
-        ]
-
-        risk = calculate_risk(
-            price_volatility,
-            water_requirement,
-            irrigation,
-            weather_risk
-        )
-
-        land_hectares = land_acres * 0.404686
-
-        production = (
-            historical_yield
-            * land_hectares
-        )
-
-        revenue = (
-            production
-            * 1000
-            * economic_result["price_per_kg"]
-        )
-
-        profit = revenue - total_cost
-
-        roi = (
-            profit / total_cost * 100
-            if total_cost > 0
-            else 0
-        )
-
-        score = roi
-
-        if risk == "Low":
-            score += 15
-        elif risk == "Medium":
-            score += 5
-        else:
-            score -= 10
-
-        if weather_risk == "Medium":
-            score -= 5
-        elif weather_risk == "High":
-            score -= 15
-
-        recommendation = {
-            "Crop": crop,
-            "Historical Yield": round(
-                historical_yield, 2
-            ),
-            "Expected Revenue": round(
-                revenue, 2
-            ),
-            "Estimated Cost": round(
-                total_cost, 2
-            ),
-            "Expected Profit": round(
-                profit, 2
-            ),
-            "ROI (%)": round(
-                roi, 2
-            ),
-            "Risk": risk,
-            "Score": round(score, 2)
-        }
-        if weather_risk is not None:
-            recommendation["Weather Risk"] = weather_risk
-        recommendations.append(recommendation)
-
-    result = pd.DataFrame(
-        recommendations
-    )
-
-    if result.empty:
-        return result
-
-    return result.sort_values(
-        "Score",
-        ascending=False
-    ).reset_index(drop=True)
-    

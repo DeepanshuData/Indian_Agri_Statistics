@@ -1,26 +1,29 @@
 from pathlib import Path
 from html import escape
+import hashlib
+import os
 import re
 import json
 import base64
+import tempfile
+import zipfile
+import xml.etree.ElementTree as ET
 
 import numpy as np
 import pandas as pd
-import pydeck as pdk
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.graph_objects import Figure
 from plotly.subplots import make_subplots
 import requests
 import streamlit as st
-from shapely.geometry import mapping, shape
 
 from market_engine import calculate_market_opportunity
 from profitability_engine import calculate_profitability
 from recommendation_engine import (
     canonical_crop_name,
-    get_historical_crop_yields,
-    recommend_crops,
+    calculate_risk,
+    get_historical_crop_summary,
 )
 from weather_engine import (
     calculate_weather_risk,
@@ -175,19 +178,6 @@ def format_currency(value: float | int) -> str:
     return f"₹{value:,.0f}"
 
 
-def crops_with_economics(
-    crops: list[str], economics: pd.DataFrame
-) -> list[str]:
-    economic_names = {
-        canonical_crop_name(crop) for crop in economics["crop"].dropna()
-    }
-    return [
-        crop
-        for crop in crops
-        if canonical_crop_name(crop) in economic_names
-    ]
-
-
 @st.cache_data(ttl=1800, show_spinner=False)
 def cached_geocode_location(district: str, state: str) -> dict | None:
     return geocode_location(district.strip(), state.strip())
@@ -214,15 +204,26 @@ def weather_for_location(state: str, district: str) -> tuple[dict, dict]:
 def render_crop_recommendations(dataframe: pd.DataFrame, economics: pd.DataFrame) -> None:
     render_page_header(
         "What Should I Grow?",
-        "Rank crops using district-season yield history, estimated economics, "
-        "irrigation fit and an optional 5-day weather risk adjustment.",
+        "Compare district-season historical yields, reference costs, irrigation "
+        "risk and an optional 5-day weather adjustment.",
         "Crop intelligence",
+    )
+    st.warning(
+        "Agriculture units are unverified. Historical yield is shown only in "
+        "source units; this page does not convert it to revenue or rank crops "
+        "by profit. Use these comparisons as context, not as planting advice."
     )
 
     state_options = available_options(dataframe, "state")
+    if not state_options:
+        st.info("No state records are available for crop comparisons.")
+        return
     state = st.selectbox("State", state_options, key="grow_state")
     state_data = dataframe.loc[dataframe["state"] == state]
     district_options = available_options(state_data, "district")
+    if not district_options:
+        st.info(f"No district records are available for {state}.")
+        return
     district = st.selectbox("District", district_options, key="grow_district")
     district_data = state_data.loc[state_data["district"] == district]
     seasons = ["All"] + available_options(district_data, "season")
@@ -245,11 +246,11 @@ def render_crop_recommendations(dataframe: pd.DataFrame, economics: pd.DataFrame
         )
 
     include_weather = st.checkbox(
-        "Include current 5-day weather risk in ranking",
-        value=True,
+        "Include current 5-day weather risk in crop risk",
+        value=False,
         key="grow_weather",
     )
-    if st.button("Rank suitable crops", type="primary", key="rank_crops"):
+    if st.button("Compare historical crop performance", type="primary", key="rank_crops"):
         weather_risk = None
         if include_weather:
             try:
@@ -269,103 +270,151 @@ def render_crop_recommendations(dataframe: pd.DataFrame, economics: pd.DataFrame
                 st.error(str(error))
                 return
 
-        results = recommend_crops(
+        history = get_historical_crop_summary(
             dataframe,
-            economics,
+            state,
             district,
-            land_acres,
-            budget,
-            irrigation,
             season,
-            weather_risk,
         )
-        if results.empty:
+        if history.empty:
             st.info(
-                "No crop has both matching historical yield and economics within "
-                "this budget. Try a larger budget, another season or another district."
+                "No valid area, production and year observations were found for "
+                "this state, district and season."
             )
-        else:
-            top_crop = results.iloc[0]
-            st.subheader("Top-ranked option")
-            st.markdown(
-                f"### {top_crop['Crop']}"
-                f"  \nRisk: **{top_crop['Risk']}**"
+            return
+
+        economics_by_crop = {
+            canonical_crop_name(row.crop): row
+            for row in economics.itertuples(index=False)
+        }
+        comparisons = []
+        for row in history.itertuples(index=False):
+            reference = economics_by_crop.get(canonical_crop_name(row.crop))
+            if reference is None:
+                cost = pd.NA
+                water_requirement = "Not available"
+                volatility = pd.NA
+                crop_risk = "Not available"
+            else:
+                cost = float(reference.cost_per_acre) * land_acres
+                water_requirement = reference.water_requirement
+                volatility = float(reference.price_volatility)
+                crop_risk = calculate_risk(
+                    volatility,
+                    water_requirement,
+                    irrigation,
+                    weather_risk,
+                )
+            comparisons.append(
+                {
+                    "Crop": row.crop,
+                    "Historical yield (source units)": row.historical_yield,
+                    "Area (source units)": row.total_area,
+                    "Production (source units)": row.total_production,
+                    "Years of history": row.years_of_history,
+                    "Observations": row.observations,
+                    "Reference cost (₹)": cost,
+                    "Within budget": (
+                        pd.NA if pd.isna(cost) else cost <= budget
+                    ),
+                    "Water requirement": water_requirement,
+                    "Reference price volatility": volatility,
+                    "Risk context": crop_risk,
+                }
             )
-            result_columns = st.columns(3)
-            result_columns[0].metric(
-                "Expected profit", format_currency(top_crop["Expected Profit"])
-            )
-            result_columns[1].metric(
-                "Historical yield",
-                f"{top_crop['Historical Yield']:,.2f} tonnes/hectare",
-            )
-            result_columns[2].metric("Estimated ROI", f"{top_crop['ROI (%)']:,.1f}%")
-            st.subheader("Crop ranking")
-            st.dataframe(
-                results.drop(columns=["Score"]),
-                width="stretch",
-                hide_index=True,
-            )
-            st.caption(
-                "Ranking combines estimated ROI with crop risk; an included "
-                "medium/high weather risk applies an additional ranking penalty. "
-                "Economics are reference estimates from the supplied crop data."
-            )
+        results = pd.DataFrame(comparisons)
+        top_crop = results.iloc[0]
+        st.subheader("Highest historical yield")
+        st.markdown(
+            f"### {top_crop['Crop']}"
+            f"  \nHistorical yield: "
+            f"**{top_crop['Historical yield (source units)']:,.3f} source units**"
+        )
+        st.caption(
+            "The table is ordered by aggregated historical production ÷ area. "
+            "Reference costs and risk are context only, not a profitability score."
+        )
+        st.dataframe(results, width="stretch", hide_index=True)
+        if include_weather and weather_risk is not None:
+            st.caption(f"Weather risk used for context: {weather_risk}.")
 
 
 def render_profitability(dataframe: pd.DataFrame, economics: pd.DataFrame) -> None:
     render_page_header(
         "Profitability",
-        "Estimate revenue, cost, profit, ROI and crop price risk using historical "
-        "yield for a selected district and season.",
+        "Estimate revenue, costs, profit and ROI from your own expected harvest "
+        "amount, price and cost assumptions.",
         "Crop intelligence",
+    )
+    st.warning(
+        "Source yield units are unverified, so historical yield is not converted "
+        "into production. Enter your expected harvest directly in kilograms; "
+        "reference price and cost values are estimates and can be edited."
     )
 
     state_options = available_options(dataframe, "state")
+    if not state_options:
+        st.info("No state records are available.")
+        return
     state = st.selectbox("State", state_options, key="profit_state")
     state_data = dataframe.loc[dataframe["state"] == state]
     district_options = available_options(state_data, "district")
+    if not district_options:
+        st.info(f"No district records are available for {state}.")
+        return
     district = st.selectbox("District", district_options, key="profit_district")
     district_data = state_data.loc[state_data["district"] == district]
     season_options = ["All"] + available_options(district_data, "season")
     season = st.selectbox("Season", season_options, key="profit_season")
-    yields = get_historical_crop_yields(dataframe, district, season)
-    crops = crops_with_economics(
-        available_options(yields, "crop") if not yields.empty else [],
-        economics,
-    )
+    history = get_historical_crop_summary(dataframe, state, district, season)
+    crops = available_options(economics, "crop")
     if not crops:
-        st.info(
-            "No crops in this district and season have both yield history and "
-            "reference economics."
-        )
+        st.info("No crop economics reference data is currently available.")
         return
 
     crop = st.selectbox("Crop", crops, key="profit_crop")
-    historical_yield = float(
-        yields.loc[yields["crop"] == crop, "historical_yield"].iloc[0]
-    )
     crop_economics = economics.loc[
         economics["crop"].map(canonical_crop_name) == canonical_crop_name(crop)
     ].iloc[0]
-    st.metric("Historical average yield", f"{historical_yield:,.2f} tonnes/hectare")
+    historical_crop = history.loc[
+        history["crop"].map(canonical_crop_name) == canonical_crop_name(crop)
+    ]
+    if historical_crop.empty:
+        st.info(
+            "There is no valid historical yield for this crop in the selected "
+            "district and season. The scenario below still uses only your "
+            "entered harvest amount."
+        )
+    else:
+        st.metric(
+            "Historical yield (source units; not used in estimate)",
+            f"{historical_crop.iloc[0]['historical_yield']:,.3f}",
+        )
 
-    input_columns = st.columns(3)
+    input_columns = st.columns(4)
     with input_columns[0]:
         land_acres = st.number_input(
             "Land (acres)", min_value=0.1, value=1.0, step=0.5, key="profit_land"
         )
     with input_columns[1]:
+        expected_production_kg = st.number_input(
+            "Expected harvest (kg)",
+            min_value=0.0,
+            value=1000.0,
+            step=100.0,
+            key="profit_production_kg",
+        )
+    with input_columns[2]:
         price_per_kg = st.number_input(
-            "Price (₹/kg)",
+            "Selling price (₹/kg)",
             min_value=0.0,
             value=float(crop_economics["price_per_kg"]),
             step=1.0,
             key="profit_price",
         )
-    with input_columns[2]:
+    with input_columns[3]:
         cost_per_acre = st.number_input(
-            "Cost (₹/acre)",
+            "Growing cost (₹/acre)",
             min_value=0.0,
             value=float(crop_economics["cost_per_acre"]),
             step=1000.0,
@@ -373,14 +422,18 @@ def render_profitability(dataframe: pd.DataFrame, economics: pd.DataFrame) -> No
         )
 
     if st.button("Calculate profitability", type="primary", key="calculate_profit"):
-        result = calculate_profitability(
-            crop,
-            land_acres,
-            historical_yield,
-            economics,
-            price_per_kg=price_per_kg,
-            cost_per_acre=cost_per_acre,
-        )
+        try:
+            result = calculate_profitability(
+                crop,
+                land_acres,
+                expected_production_kg,
+                economics,
+                price_per_kg=price_per_kg,
+                cost_per_acre=cost_per_acre,
+            )
+        except ValueError as error:
+            st.error(str(error))
+            return
         if result is None:
             st.error("Economics are not available for the selected crop.")
             return
@@ -397,14 +450,15 @@ def render_profitability(dataframe: pd.DataFrame, economics: pd.DataFrame) -> No
         )
         metric_columns[3].metric("ROI", f'{result["ROI (%)"]:,.1f}%')
         st.info(
-            f'Estimated production: {result["Expected Production (tonnes)"]:,.2f} tonnes'
-            f'  ·  Risk: {result["Risk"]}  ·  Price volatility: '
-            f'{result["Price Volatility"]:.0%}  ·  Water requirement: '
-            f'{result["Water Requirement"]}'
+            f'Entered harvest: {result["Expected Production (kg)"]:,.0f} kg'
+            f'  ·  Crop price risk: {result["Risk"]}'
+            f'  ·  Reference price volatility: {result["Price Volatility"]:.0%}'
+            f'  ·  Water requirement: {result["Water Requirement"]}'
         )
         st.caption(
-            "Yield is the historical district-season mean in the agriculture data. "
-            "Price and cost are editable assumptions; actual outcomes vary."
+            "Revenue uses entered kilograms × entered selling price. Cost uses "
+            "entered growing cost per acre × land area. The historical yield "
+            "shown above is context only and is not converted into production."
         )
 
 
@@ -761,6 +815,8 @@ def load_district_coordinates(coordinates_path: str) -> pd.DataFrame:
 def render_crop_dna(
     dataframe: pd.DataFrame, economics: pd.DataFrame | None = None
 ) -> None:
+    import pydeck as pdk
+
     st.markdown(
         '<div class="crop-dna-header"><div><div class="page-eyebrow">'
         'CROP & FIELD INTELLIGENCE</div><h1 class="page-title">Crop DNA</h1>'
@@ -822,12 +878,15 @@ def render_crop_dna(
         )
         metrics = st.columns(4, gap="small")
         metrics[0].metric(
-            "Area-weighted yield",
-            "—" if pd.isna(weighted_yield) else f"{weighted_yield:,.2f} t/ha",
+            "Area-weighted yield (source units)",
+            "—" if pd.isna(weighted_yield) else f"{weighted_yield:,.2f}",
         )
-        metrics[1].metric("Recorded area", format_compact(area_total) + " ha")
+        metrics[1].metric(
+            "Recorded area (source units)", format_compact(area_total)
+        )
         metrics[2].metric(
-            "Recorded production", format_compact(production_total) + " t"
+            "Recorded production (source units)",
+            format_compact(production_total),
         )
         metrics[3].metric("Reporting states", f"{state_count:,}")
 
@@ -891,7 +950,10 @@ def render_crop_dna(
                     x="year",
                     y="weighted_yield",
                     markers=True,
-                    labels={"year": "Reporting year", "weighted_yield": "Yield (t/ha)"},
+                    labels={
+                        "year": "Reporting year",
+                        "weighted_yield": "Yield (source units unverified)",
+                    },
                     color_discrete_sequence=["#80d59b"],
                 )
                 chart_layout(yield_figure, height=330)
@@ -917,7 +979,7 @@ def render_crop_dna(
                     x="area",
                     y="state",
                     orientation="h",
-                    labels={"area": "Area (ha)", "state": ""},
+                    labels={"area": "Area (source units unverified)", "state": ""},
                     color_discrete_sequence=["#5da779"],
                 )
                 leaders_figure.update_yaxes(autorange="reversed")
@@ -1007,11 +1069,12 @@ def render_crop_dna(
             "Districts with coordinate matches", f"{len(map_data):,}"
         )
         field_metric_columns[1].metric(
-            "Recorded area", format_compact(district_summary["area"].sum()) + " ha"
+            "Recorded area (source units)",
+            format_compact(district_summary["area"].sum()),
         )
         field_metric_columns[2].metric(
-            "Recorded production",
-            format_compact(district_summary["production"].sum()) + " t",
+            "Recorded production (source units)",
+            format_compact(district_summary["production"].sum()),
         )
         field_map = pdk.Deck(
             layers=[
@@ -1037,8 +1100,8 @@ def render_crop_dna(
             tooltip={
                 "html": (
                     "<b>{district}</b>, {state}<br/>"
-                    "Recorded area: {area} ha<br/>"
-                    "Production: {production} t<br/>"
+                    "Recorded area (source units): {area}<br/>"
+                    "Production (source units): {production}<br/>"
                     "Records: {record_count}"
                 ),
                 "style": {"backgroundColor": "#10231a", "color": "#f0f6ef"},
@@ -1069,14 +1132,20 @@ def render_crop_dna(
                 columns={
                     "state": "State",
                     "district": "District",
-                    "area": "Area (ha)",
-                    "production": "Production (t)",
+                    "area": "Area (source units)",
+                    "production": "Production (source units)",
                     "record_count": "Records",
                 }
             )
             st.dataframe(
                 district_table[
-                    ["State", "District", "Area (ha)", "Production (t)", "Records"]
+                    [
+                        "State",
+                        "District",
+                        "Area (source units)",
+                        "Production (source units)",
+                        "Records",
+                    ]
                 ],
                 width="stretch",
                 hide_index=True,
@@ -1138,23 +1207,68 @@ def spatial_location_key(state: object, district: object) -> str:
 
 
 @st.cache_data(show_spinner="Preparing interactive district boundaries...")
-def load_district_boundaries(boundary_path: str) -> dict:
-    with Path(boundary_path).open(encoding="utf-8") as boundary_file:
+def load_district_boundaries(
+    boundary_path: str, source_mtime_ns: int
+) -> dict:
+    from shapely.geometry import mapping, shape
+
+    source_path = Path(boundary_path)
+    cache_hash = hashlib.sha256(
+        str(source_path.resolve()).encode("utf-8")
+    ).hexdigest()[:16]
+    cache_directory = (
+        Path(tempfile.gettempdir())
+        / "Indian_Agri_Statistics"
+        / cache_hash
+    )
+    cache_path = cache_directory / "river_districts_simplified_v1.geojson"
+    if (
+        cache_path.is_file()
+        and cache_path.stat().st_mtime_ns >= source_mtime_ns
+    ):
+        with cache_path.open(encoding="utf-8") as boundary_file:
+            return json.load(boundary_file)
+
+    with source_path.open(encoding="utf-8") as boundary_file:
         boundary_data = json.load(boundary_file)
 
     simplified_features = []
     for feature in boundary_data.get("features", []):
         geometry = shape(feature["geometry"]).simplify(
-            0.01, preserve_topology=True
+            0.01, preserve_topology=False
         )
+        source_properties = feature.get("properties", {})
         simplified_features.append(
             {
-                **feature,
+                "type": feature.get("type", "Feature"),
                 "geometry": mapping(geometry),
-                "properties": dict(feature.get("properties", {})),
+                "properties": {
+                    key: source_properties.get(key)
+                    for key in ("district_id", "statename", "distname")
+                },
             }
         )
-    return {**boundary_data, "features": simplified_features}
+    simplified_boundary_data = {
+        **boundary_data,
+        "features": simplified_features,
+    }
+
+    cache_directory.mkdir(parents=True, exist_ok=True)
+    temporary_path = cache_path.with_name(
+        f"{cache_path.name}.{os.getpid()}.tmp"
+    )
+    try:
+        with temporary_path.open("w", encoding="utf-8") as cache_file:
+            json.dump(
+                simplified_boundary_data,
+                cache_file,
+                separators=(",", ":"),
+            )
+        os.replace(temporary_path, cache_path)
+    finally:
+        if temporary_path.exists():
+            temporary_path.unlink()
+    return simplified_boundary_data
 
 
 def reset_spatial_map() -> None:
@@ -1215,6 +1329,9 @@ def map_style_for_basemap(selected_basemap: str) -> str:
 
 
 def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
+    import pydeck as pdk
+    from shapely.geometry import shape
+
     st.markdown(
         '<div class="gis-toolbar">'
         '<div><div class="gis-eyebrow">GEOSPATIAL INTELLIGENCE</div>'
@@ -1263,7 +1380,9 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
         return
 
     try:
-        boundary_data = load_district_boundaries(str(boundary_path))
+        boundary_data = load_district_boundaries(
+            str(boundary_path), boundary_path.stat().st_mtime_ns
+        )
     except (OSError, json.JSONDecodeError, ValueError) as error:
         st.error(f"Could not load district boundary geometries: {error}")
         return
@@ -1496,9 +1615,9 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
     }
     metric_units = {
         "River-buffer coverage": "%",
-        "Cultivated area": "ha",
-        "Production": "tonnes",
-        "Average yield": "t/ha",
+        "Cultivated area": "source area units (unverified)",
+        "Production": "source production units (unverified)",
+        "Average yield": "production / area (units unverified)",
     }
     metric_labels = {
         "River-buffer coverage": "River-buffer area coverage",
@@ -1597,9 +1716,9 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
                 "html": (
                     "<b>{distname}</b> · {statename}"
                     "<br/>River-buffer coverage: {coverage_percentage}%"
-                    "<br/>Agricultural area: {cultivated_area} ha"
-                    "<br/>Production: {production} tonnes"
-                    "<br/>Yield: {average_yield} t/ha"
+                    "<br/>Agricultural area (source units): {cultivated_area}"
+                    "<br/>Production (source units): {production}"
+                    "<br/>Yield (production / area): {average_yield}"
                     "<br/>Matching records: {record_count}"
                 ),
                 "style": {
@@ -1702,18 +1821,18 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
                         "Cultivated area",
                         "—"
                         if pd.isna(agriculture_values.get("cultivated_area", np.nan))
-                        else f"{agriculture_values['cultivated_area']:,.0f} ha",
+                        else f"{agriculture_values['cultivated_area']:,.0f}",
                     )
                     st.metric(
-                        "Recorded production",
+                        "Recorded production (source units)",
                         "—"
                         if pd.isna(agriculture_values.get("production", np.nan))
-                        else f"{agriculture_values['production']:,.0f} t",
+                        else f"{agriculture_values['production']:,.0f}",
                     )
                     yield_value = agriculture_values.get("average_yield", np.nan)
                     st.metric(
-                        "Area-weighted yield",
-                        "—" if pd.isna(yield_value) else f"{yield_value:,.2f} t/ha",
+                        "Area-weighted yield (source units)",
+                        "—" if pd.isna(yield_value) else f"{yield_value:,.2f}",
                     )
                     if selected_coverage is not None:
                         st.metric(
@@ -1744,7 +1863,10 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
                             x="production",
                             y="crop",
                             orientation="h",
-                            labels={"production": "Production (tonnes)", "crop": ""},
+                            labels={
+                                "production": "Production (source units)",
+                                "crop": "",
+                            },
                             color_discrete_sequence=[ACCENT_GREEN],
                         )
                         chart_layout(crop_figure, height=230)
@@ -1768,7 +1890,7 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
                         "Cultivated area",
                         "—"
                         if state_rows.empty
-                        else f"{state_rows['cultivated_area'].sum(min_count=1):,.0f} ha",
+                        else f"{state_rows['cultivated_area'].sum(min_count=1):,.0f}",
                     )
                     st.metric(
                         "Recorded production",
@@ -1788,7 +1910,7 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
                     "Cultivated area",
                     "—"
                     if national_stats.empty
-                    else f"{national_stats['cultivated_area'].sum(min_count=1):,.0f} ha",
+                    else f"{national_stats['cultivated_area'].sum(min_count=1):,.0f}",
                 )
                 st.metric(
                     "Recorded production",
@@ -1896,6 +2018,650 @@ def render_spatial_analysis(dataframe: pd.DataFrame) -> None:
     comparison_columns[3].metric("Largest percentage difference", "603.44%")
 
 
+@st.cache_data(show_spinner="Loading India Rice yield boundaries...")
+def load_rice_yield_geojson(gpkg_path: str) -> dict:
+    import geopandas as gpd
+
+    spatial = gpd.read_file(gpkg_path, layer="india_rice_yield")
+    required = {"state", "district", "crop_yield", "match_status", "geometry"}
+    missing = required.difference(spatial.columns)
+    if missing:
+        raise ValueError(
+            "Rice map data is missing columns: " + ", ".join(sorted(missing))
+        )
+    if len(spatial) != 735:
+        raise ValueError(
+            f"Rice map data must contain 735 boundaries; found {len(spatial)}."
+        )
+    if spatial.crs is None or spatial.crs.to_epsg() != 4326:
+        raise ValueError(
+            f"Rice map data must use EPSG:4326; found {spatial.crs!s}."
+        )
+    if (
+        spatial.geometry.isna().any()
+        or spatial.geometry.is_empty.any()
+        or (~spatial.geometry.is_valid).any()
+    ):
+        raise ValueError("Rice map data contains invalid or empty geometries.")
+
+    spatial = spatial.copy()
+    spatial.geometry = spatial.geometry.simplify(
+        0.01, preserve_topology=True
+    )
+    return json.loads(spatial.to_json(drop_id=True))
+
+
+@st.cache_data(show_spinner=False)
+def load_rice_jenks_ranges(project_path: str) -> list[tuple[float, float]]:
+    with zipfile.ZipFile(project_path) as archive:
+        project_members = [
+            member for member in archive.namelist() if member.endswith(".qgs")
+        ]
+        if not project_members:
+            raise ValueError("QGIS project archive contains no .qgs project.")
+        project_xml = ET.fromstring(archive.read(project_members[0]))
+
+    renderer = next(
+        (
+            element
+            for element in project_xml.iter("renderer-v2")
+            if element.get("attr") == "crop_yield"
+        ),
+        None,
+    )
+    if renderer is None:
+        raise ValueError("QGIS project has no crop_yield renderer.")
+    ranges = []
+    for item in renderer.findall("./ranges/range"):
+        try:
+            ranges.append((float(item.attrib["lower"]), float(item.attrib["upper"])))
+        except (KeyError, ValueError) as error:
+            raise ValueError("QGIS project has an invalid Jenks range.") from error
+    if len(ranges) != 5:
+        raise ValueError(
+            f"QGIS project must define five Jenks ranges; found {len(ranges)}."
+        )
+    return ranges
+
+
+@st.cache_data(show_spinner=False)
+def load_rice_output_csv(csv_path: str) -> pd.DataFrame:
+    return pd.read_csv(csv_path)
+
+
+def rice_metric_values(csv_path: Path) -> dict[str, object]:
+    quality = load_rice_output_csv(str(csv_path))
+    if not {"metric", "value"}.issubset(quality.columns):
+        raise ValueError("Rice data-quality summary has an unexpected schema.")
+    return dict(zip(quality["metric"], quality["value"]))
+
+
+def rice_jenks_color(value: object, ranges: list[tuple[float, float]]) -> list[int]:
+    colors = [
+        [247, 252, 245, 230],
+        [185, 206, 191, 230],
+        [124, 160, 136, 230],
+        [62, 114, 82, 230],
+        [0, 68, 27, 230],
+    ]
+    if value is None or pd.isna(value):
+        return [86, 96, 88, 210]
+    numeric_value = float(value)
+    for index, (lower, upper) in enumerate(ranges):
+        if lower <= numeric_value <= upper:
+            return colors[index]
+    return colors[0] if numeric_value < ranges[0][0] else colors[-1]
+
+
+def render_rice_yield_gis() -> None:
+    import pydeck as pdk
+    from shapely.geometry import shape
+
+    render_page_header(
+        "India Rice Yield GIS",
+        "Explore the district-level Rice yield map, analysis charts, and "
+        "district matching results from the completed PostGIS workflow.",
+        "Geospatial intelligence",
+    )
+    csv_directory = PROJECT_ROOT / "output" / "csv"
+    map_directory = PROJECT_ROOT / "output" / "maps"
+    required_files = {
+        "district summary": csv_directory / "district_rice_summary.csv",
+        "state summary": csv_directory / "state_rice_summary.csv",
+        "data quality": csv_directory / "rice_data_quality_summary.csv",
+        "match summary": csv_directory / "spatial_match_summary.csv",
+        "top production": csv_directory / "top_10_rice_production.csv",
+        "top yield": csv_directory / "top_10_rice_yield.csv",
+        "state analysis": csv_directory / "state_rice_analysis.csv",
+        "area and production": csv_directory / "rice_area_production_comparison.csv",
+        "yield distribution": csv_directory / "rice_yield_distribution.csv",
+        "unmatched districts": csv_directory / "unmatched_rice_districts.csv",
+        "map data": map_directory / "India_Rice_Yield_Data.gpkg",
+        "map project": map_directory / "India_Rice_Yield_Project.qgz",
+        "map image": map_directory / "India_Rice_Yield_Map.png",
+        "map PDF": map_directory / "India_Rice_Yield_Map.pdf",
+        "analysis report": PROJECT_ROOT / "output" / "reports" / "Agriculture_GIS_Analysis_Report.pdf",
+    }
+    missing = [
+        f"{label}: {path}"
+        for label, path in required_files.items()
+        if not path.is_file()
+    ]
+    if missing:
+        st.warning(
+            "Rice GIS outputs are incomplete. Run the pipeline from the project "
+            "root with `"
+            r".\.venv\Scripts\python.exe .\main.py"
+            "`."
+        )
+        st.code("\n".join(missing))
+        return
+
+    try:
+        quality = rice_metric_values(required_files["data quality"])
+        match_summary = load_rice_output_csv(
+            str(required_files["match summary"])
+        )
+        district_summary = load_rice_output_csv(
+            str(required_files["district summary"])
+        )
+        state_summary = load_rice_output_csv(
+            str(required_files["state summary"])
+        )
+        top_production = load_rice_output_csv(
+            str(required_files["top production"])
+        )
+        top_yield = load_rice_output_csv(str(required_files["top yield"]))
+        state_analysis = load_rice_output_csv(
+            str(required_files["state analysis"])
+        )
+        area_production = load_rice_output_csv(
+            str(required_files["area and production"])
+        )
+        yield_distribution = load_rice_output_csv(
+            str(required_files["yield distribution"])
+        )
+        map_data = load_rice_yield_geojson(
+            str(required_files["map data"])
+        )
+        jenks_ranges = load_rice_jenks_ranges(
+            str(required_files["map project"])
+        )
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        pd.errors.ParserError,
+        pd.errors.EmptyDataError,
+        zipfile.BadZipFile,
+        ET.ParseError,
+    ) as error:
+        st.error(f"Could not load or validate the Rice GIS outputs: {error}")
+        return
+
+    metrics = dict(
+        zip(match_summary["metric"], pd.to_numeric(match_summary["value"]))
+    )
+    units = (
+        str(quality.get("area_unit", "unknown")).casefold() == "unknown"
+        or str(quality.get("production_unit", "unknown")).casefold() == "unknown"
+    )
+    if units:
+        st.warning(
+            "Source area and production units are unverified. Values below are "
+            "shown as source units; do not interpret them as hectares or tonnes."
+        )
+
+    kpis = st.columns(4)
+    kpis[0].metric(
+        "District boundaries",
+        f"{int(metrics.get('boundary_features', len(map_data['features']))):,}",
+    )
+    kpis[1].metric(
+        "Rice districts matched",
+        f"{int(metrics.get('matched_district_summaries', 0)):,}",
+        help="Exact state-and-district matches plus evidence-verified crosswalks.",
+    )
+    kpis[2].metric(
+        "Unresolved summaries",
+        f"{int(metrics.get('unmatched_district_summaries', 0)):,}",
+    )
+    kpis[3].metric(
+        "Valid Rice observations",
+        f"{int(float(quality.get('rice_valid_analytical_rows', 0))):,}",
+    )
+
+    tabs = st.tabs(["Yield map", "Charts", "Data & matching", "Downloads"])
+    with tabs[0]:
+        state_names = sorted(
+            {
+                str(feature["properties"].get("state"))
+                for feature in map_data["features"]
+                if feature.get("properties", {}).get("state")
+            }
+        )
+        controls = st.columns([1, 1, 2])
+        selected_state = controls[0].selectbox(
+            "State / territory",
+            ["All India"] + state_names,
+            key="rice_yield_map_state",
+        )
+        available_features = [
+            feature
+            for feature in map_data["features"]
+            if selected_state == "All India"
+            or feature["properties"].get("state") == selected_state
+        ]
+        district_choices = sorted(
+            {
+                (
+                    str(feature["properties"].get("state")),
+                    str(feature["properties"].get("district")),
+                )
+                for feature in available_features
+                if feature.get("properties", {}).get("district")
+                and feature.get("properties", {}).get("state")
+            }
+        )
+        district_names = [
+            f"{state} | {district}" for state, district in district_choices
+        ]
+        selected_district = controls[1].selectbox(
+            "District focus",
+            ["All districts"] + district_names,
+            key="rice_yield_map_district",
+        )
+        controls[2].caption(
+            "The map uses the same five Natural Breaks (Jenks) classes as the "
+            "saved QGIS project. Gray polygons have no matched Rice data."
+        )
+
+        features = []
+        selected_district_pair = (
+            tuple(selected_district.split(" | ", maxsplit=1))
+            if selected_district != "All districts"
+            else None
+        )
+        for feature in available_features:
+            properties = dict(feature["properties"])
+            if (
+                selected_district_pair is not None
+                and (
+                    properties.get("state"),
+                    properties.get("district"),
+                )
+                != selected_district_pair
+            ):
+                continue
+            properties["fill_color"] = rice_jenks_color(
+                properties.get("crop_yield"), jenks_ranges
+            )
+            properties["line_color"] = [196, 216, 197, 200]
+            features.append(
+                {**feature, "properties": properties}
+            )
+
+        map_columns = st.columns([2.1, 0.9], gap="medium")
+        with map_columns[0]:
+            if features:
+                geometries = [shape(item["geometry"]) for item in features]
+                if selected_district != "All districts":
+                    center = geometries[0].representative_point()
+                    latitude, longitude, zoom = center.y, center.x, 7
+                elif selected_state != "All India":
+                    bounds = [geometry.bounds for geometry in geometries]
+                    longitude = (
+                        min(bounds_item[0] for bounds_item in bounds)
+                        + max(bounds_item[2] for bounds_item in bounds)
+                    ) / 2
+                    latitude = (
+                        min(bounds_item[1] for bounds_item in bounds)
+                        + max(bounds_item[3] for bounds_item in bounds)
+                    ) / 2
+                    zoom = 5
+                else:
+                    latitude, longitude, zoom = 22.9, 78.9, 3.55
+                map_key = "rice_yield_map"
+                selected_map = st.pydeck_chart(
+                    pdk.Deck(
+                        layers=[
+                            pdk.Layer(
+                                "GeoJsonLayer",
+                                id="rice-yield-districts",
+                                data={
+                                    "type": "FeatureCollection",
+                                    "features": features,
+                                },
+                                pickable=True,
+                                stroked=True,
+                                filled=True,
+                                get_fill_color="properties.fill_color",
+                                get_line_color="properties.line_color",
+                                get_line_width=1,
+                                line_width_min_pixels=1,
+                                auto_highlight=True,
+                            )
+                        ],
+                        initial_view_state=pdk.ViewState(
+                            latitude=latitude,
+                            longitude=longitude,
+                            zoom=zoom,
+                            pitch=0,
+                        ),
+                        map_style=map_style_for_basemap("Dark geography"),
+                        tooltip={
+                            "html": (
+                                "<b>{district}</b> · {state}"
+                                "<br/>Rice yield: {crop_yield}"
+                                "<br/>Production: {total_production}"
+                                "<br/>Area: {total_area}"
+                                "<br/>Match: {match_status}"
+                            ),
+                            "style": {
+                                "backgroundColor": "#101a15",
+                                "color": "#e8f0e9",
+                            },
+                        },
+                    ),
+                    width="stretch",
+                    height=620,
+                    on_select="rerun",
+                    selection_mode="single-object",
+                    key=map_key,
+                )
+            else:
+                selected_map = None
+                st.info("No district geometry matches the selected filters.")
+
+        selected_properties = selected_map_feature(
+            {
+                "selection": (
+                    selected_map.selection
+                    if selected_map is not None
+                    and hasattr(selected_map, "selection")
+                    else {}
+                )
+            }
+        )
+        if selected_properties is None and selected_district_pair is not None:
+            selected_properties = next(
+                (
+                    item["properties"]
+                    for item in features
+                    if (
+                        item["properties"].get("state"),
+                        item["properties"].get("district"),
+                    )
+                    == selected_district_pair
+                ),
+                None,
+            )
+        with map_columns[1]:
+            with st.container(border=True):
+                st.markdown("#### Selected district")
+                if selected_properties:
+                    st.markdown(
+                        f"**{escape(str(selected_properties.get('district', 'District')))}**"
+                    )
+                    st.caption(str(selected_properties.get("state", "")))
+                    for label, key in (
+                        ("Area (source units)", "total_area"),
+                        ("Production (source units)", "total_production"),
+                        ("Yield (source units)", "crop_yield"),
+                    ):
+                        value = selected_properties.get(key)
+                        st.metric(
+                            label,
+                            "—"
+                            if value is None or pd.isna(value)
+                            else f"{float(value):,.3f}",
+                        )
+                    st.caption(
+                        f"Match status: {selected_properties.get('match_status', 'unknown')}"
+                    )
+                else:
+                    st.metric(
+                        "Districts shown",
+                        f"{len(features):,}",
+                    )
+                    st.metric(
+                        "Districts with Rice yield",
+                        f"{sum(item['properties'].get('crop_yield') is not None for item in features):,}",
+                    )
+                    st.caption(
+                        "Select a district in the map or use the district focus "
+                        "selector to inspect its summary."
+                    )
+
+        st.caption(
+            "Rice totals aggregate all valid source years and seasons. "
+            "The map is a district-level summary, not a current-season forecast."
+        )
+
+    with tabs[1]:
+        st.caption(
+            "Charts are built from the exported spatial-analysis CSVs. "
+            "District rankings include all 647 agricultural summaries, whether "
+            "or not a reliable boundary match exists."
+        )
+        production_column, yield_column = st.columns(2, gap="large")
+        with production_column:
+            production_chart = px.bar(
+                top_production.sort_values("total_production"),
+                x="total_production",
+                y="district",
+                color="state",
+                orientation="h",
+                labels={
+                    "total_production": "Production (source units)",
+                    "district": "",
+                    "state": "State",
+                },
+                hover_data=["state", "total_area", "crop_yield"],
+                title="Top 10 Rice-producing districts",
+            )
+            chart_layout(production_chart, height=440)
+            production_chart.update_layout(showlegend=True)
+            production_column.plotly_chart(
+                production_chart, width="stretch"
+            )
+        with yield_column:
+            yield_chart = px.bar(
+                top_yield.sort_values("crop_yield"),
+                x="crop_yield",
+                y="district",
+                color="state",
+                orientation="h",
+                labels={
+                    "crop_yield": "Production / area (units unverified)",
+                    "district": "",
+                    "state": "State",
+                },
+                hover_data=["state", "total_area", "total_production"],
+                title="Top 10 Rice-yield districts",
+            )
+            chart_layout(yield_chart, height=440)
+            yield_chart.update_layout(showlegend=True)
+            yield_column.plotly_chart(yield_chart, width="stretch")
+
+        state_yield_column, state_production_column = st.columns(
+            2, gap="large"
+        )
+        with state_yield_column:
+            state_yield = state_analysis.sort_values("average_yield")
+            state_yield_chart = px.bar(
+                state_yield,
+                x="average_yield",
+                y="state",
+                orientation="h",
+                labels={
+                    "average_yield": "Production / area (units unverified)",
+                    "state": "",
+                },
+                title="State-wise area-weighted average yield",
+                color_discrete_sequence=[MUTED_GREEN],
+            )
+            chart_layout(state_yield_chart, height=760)
+            state_yield_column.plotly_chart(
+                state_yield_chart, width="stretch"
+            )
+        with state_production_column:
+            state_production = state_analysis.sort_values("total_production")
+            state_production_chart = px.bar(
+                state_production,
+                x="total_production",
+                y="state",
+                orientation="h",
+                labels={
+                    "total_production": "Production (source units)",
+                    "state": "",
+                },
+                title="State-wise Rice production",
+                color_discrete_sequence=["#277da1"],
+            )
+            chart_layout(state_production_chart, height=760)
+            state_production_column.plotly_chart(
+                state_production_chart, width="stretch"
+            )
+
+        comparison_column, distribution_column = st.columns(2, gap="large")
+        with comparison_column:
+            comparison_chart = px.scatter(
+                area_production,
+                x="total_area",
+                y="total_production",
+                color="state",
+                hover_name="district",
+                hover_data={"crop_yield": ":.3f"},
+                labels={
+                    "total_area": "Area (source units)",
+                    "total_production": "Production (source units)",
+                    "state": "State",
+                },
+                title="District Rice area versus production",
+            )
+            chart_layout(comparison_chart, height=460)
+            comparison_chart.update_layout(showlegend=True)
+            comparison_column.plotly_chart(
+                comparison_chart, width="stretch"
+            )
+        with distribution_column:
+            distribution_chart = px.histogram(
+                yield_distribution.dropna(subset=["crop_yield"]),
+                x="crop_yield",
+                nbins=24,
+                labels={
+                    "crop_yield": "Production / area (units unverified)",
+                    "count": "Districts",
+                },
+                title="District-wise Rice yield distribution",
+                color_discrete_sequence=[ACCENT_GREEN],
+            )
+            chart_layout(distribution_chart, height=460)
+            distribution_column.plotly_chart(
+                distribution_chart, width="stretch"
+            )
+
+    with tabs[2]:
+        unresolved = load_rice_output_csv(
+            str(csv_directory / "unmatched_rice_districts.csv")
+        )
+        quality_frame = load_rice_output_csv(
+            str(required_files["data quality"])
+        )
+        st.subheader("Data quality")
+        st.dataframe(
+            quality_frame.rename(
+                columns={
+                    "metric": "Measure",
+                    "value": "Result",
+                    "details": "Method / note",
+                }
+            ),
+            width="stretch",
+            hide_index=True,
+        )
+        st.subheader("District match coverage")
+        st.dataframe(
+            match_summary.rename(
+                columns={"metric": "Match measure", "value": "Count"}
+            ),
+            width="stretch",
+            hide_index=True,
+        )
+        st.subheader("Unresolved agricultural districts")
+        st.caption(
+            "These records are not assigned to a boundary or converted to "
+            "zero. Fuzzy suggestions are review hints only."
+        )
+        st.dataframe(
+            unresolved,
+            width="stretch",
+            hide_index=True,
+            height=420,
+        )
+        st.subheader("District Rice summary")
+        state_filter = st.selectbox(
+            "Filter summaries by state",
+            ["All states"] + sorted(
+                str(value)
+                for value in district_summary["state"].dropna().unique()
+            ),
+            key="rice_summary_state",
+        )
+        filtered_summary = district_summary
+        if state_filter != "All states":
+            filtered_summary = district_summary.loc[
+                district_summary["state"].eq(state_filter)
+            ]
+        st.dataframe(
+            filtered_summary.sort_values(
+                "total_production", ascending=False
+            ),
+            width="stretch",
+            hide_index=True,
+            height=420,
+        )
+        st.subheader("State Rice summary")
+        st.dataframe(
+            state_summary.sort_values(
+                "total_production", ascending=False
+            ),
+            width="stretch",
+            hide_index=True,
+        )
+
+    with tabs[3]:
+        downloads = [
+            ("India Rice yield map (PNG)", required_files["map image"]),
+            ("India Rice yield map (PDF)", required_files["map PDF"]),
+            ("QGIS project", required_files["map project"]),
+            ("Spatial map data (GeoPackage)", required_files["map data"]),
+            ("Analysis report (PDF)", required_files["analysis report"]),
+            ("District Rice summary (CSV)", required_files["district summary"]),
+            ("State Rice summary (CSV)", required_files["state summary"]),
+            ("Unmatched districts (CSV)", csv_directory / "unmatched_rice_districts.csv"),
+            ("District match audit (CSV)", csv_directory / "district_match_audit.csv"),
+        ]
+        for label, path in downloads:
+            if path.is_file():
+                st.download_button(
+                    label=f"Download {label}",
+                    data=path.read_bytes(),
+                    file_name=path.name,
+                    mime=(
+                        "application/pdf"
+                        if path.suffix.casefold() == ".pdf"
+                        else "image/png"
+                        if path.suffix.casefold() == ".png"
+                        else "text/csv"
+                        if path.suffix.casefold() == ".csv"
+                        else "application/octet-stream"
+                    ),
+                    key=f"rice_download_{path.name}",
+                )
+
+
 dataset_path = find_dataset()
 if dataset_path is None:
     st.error(
@@ -1924,7 +2690,7 @@ TOOL_GROUPS = {
     "OVERVIEW": ["Dashboard"],
     "CROP INTELLIGENCE": ["What Should I Grow?", "Crop DNA", "Profitability"],
     "MARKET & WEATHER": ["Where Should I Sell?", "Weather Risk"],
-    "GEOSPATIAL": ["GIS & Spatial Analysis"],
+    "GEOSPATIAL": ["GIS & Spatial Analysis", "India Rice Yield GIS"],
 }
 TOOL_ICONS = {
     "Dashboard": ":material/dashboard:",
@@ -1934,6 +2700,7 @@ TOOL_ICONS = {
     "Where Should I Sell?": ":material/storefront:",
     "Weather Risk": ":material/cloud:",
     "GIS & Spatial Analysis": ":material/map:",
+    "India Rice Yield GIS": ":material/public:",
 }
 
 
@@ -2125,6 +2892,8 @@ if selected_tool != "Dashboard":
         render_market_finder(reference_data)
     elif selected_tool == "GIS & Spatial Analysis":
         render_spatial_analysis(dataset)
+    elif selected_tool == "India Rice Yield GIS":
+        render_rice_yield_gis()
     else:
         render_weather_risk(dataset)
     st.stop()
@@ -2171,7 +2940,7 @@ for crop_row in dashboard_top_crops.itertuples(index=False):
     featured_crop_items.append(
         '<div class="hero-crop-row"><span>'
         f"{escape(str(crop_row.crop))}</span><strong>"
-        f"{format_compact(crop_row.area)} ha</strong><small>"
+        f"{format_compact(crop_row.area)} source units</strong><small>"
         f"{share_label}</small></div>"
     )
 featured_crops_markup = (
@@ -2236,11 +3005,11 @@ average_yield = (
 )
 
 kpi_columns = st.columns(4)
-kpi_columns[0].metric("Total Area · ha", format_compact(area_total))
-kpi_columns[1].metric("Total Production · t", format_compact(production_total))
+kpi_columns[0].metric("Total Area · source units", format_compact(area_total))
+kpi_columns[1].metric("Total Production · source units", format_compact(production_total))
 kpi_columns[2].metric(
-    "Average Yield · t/ha",
-    "—" if pd.isna(average_yield) else f"{average_yield:,.2f} t/ha",
+    "Average Yield · source units",
+    "—" if pd.isna(average_yield) else f"{average_yield:,.2f}",
     help=(
         "Calculated as the area-weighted mean of record yields for rows with "
         "valid positive area and yield."
@@ -2286,7 +3055,7 @@ else:
                 x="area",
                 y="state",
                 orientation="h",
-                labels={"area": "Area (hectares)", "state": ""},
+                labels={"area": "Area (source units unverified)", "state": ""},
                 category_orders={"state": state_area["state"].tolist()},
                 color_discrete_sequence=[ACCENT_GREEN],
                 hover_data={"area": ":,.2f"},
@@ -2312,7 +3081,10 @@ else:
                 x="production",
                 y="crop",
                 orientation="h",
-                labels={"production": "Production (tonnes)", "crop": ""},
+                labels={
+                    "production": "Production (source units unverified)",
+                    "crop": "",
+                },
                 category_orders={"crop": crop_production["crop"].tolist()},
                 color_discrete_sequence=[MUTED_GREEN],
                 hover_data={"production": ":,.2f"},
@@ -2375,14 +3147,16 @@ else:
                 x="year",
                 y="area",
                 markers=True,
-                labels={"year": "Year", "area": "Area (hectares)"},
+                labels={"year": "Year", "area": "Area (source units unverified)"},
                 color_discrete_sequence=[ACCENT_GREEN],
             )
             annual_figure.update_traces(
                 line=dict(width=2.5),
                 marker=dict(size=5),
                 fillcolor="rgba(126, 170, 135, 0.17)",
-                hovertemplate="%{x}<br>Area: %{y:,.2f} ha<extra></extra>",
+                hovertemplate=(
+                    "%{x}<br>Area (source units): %{y:,.2f}<extra></extra>"
+                ),
             )
             chart_layout(annual_figure, height=410)
             annual_figure.update_layout(showlegend=False)
@@ -2411,13 +3185,15 @@ else:
             )
             heatmap_figure.update_traces(
                 hovertemplate="State: %{y}<br>Crop: %{x}<br>Area: "
-                "%{z:,.2f} ha<extra></extra>"
+                "%{z:,.2f} source units<extra></extra>"
             )
             heatmap_figure.update_xaxes(tickangle=-35)
             chart_layout(heatmap_figure, height=410)
             heatmap_figure.update_layout(
                 showlegend=False,
-                coloraxis_colorbar=dict(title="Hectares", thickness=10),
+                coloraxis_colorbar=dict(
+                    title="Source area units (unverified)", thickness=10
+                ),
             )
             st.plotly_chart(heatmap_figure, width="stretch")
 
